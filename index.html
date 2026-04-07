@@ -1,0 +1,4182 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SQUADX — Takımını Bul, Oyunu Kazan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg-deep: #040610;
+    --bg-dark: #080d1a;
+    --bg-card: rgba(10, 15, 35, 0.85);
+    --cyan: #00f5ff;
+    --cyan-dim: rgba(0, 245, 255, 0.15);
+    --purple: #b400ff;
+    --purple-dim: rgba(180, 0, 255, 0.15);
+    --pink: #ff0090;
+    --yellow: #ffe000;
+    --green: #00ff87;
+    --red: #ff3b3b;
+    --text-bright: #ffffff;
+    --text-mid: rgba(255,255,255,0.7);
+    --text-dim: rgba(255,255,255,0.35);
+    --border: rgba(0, 245, 255, 0.12);
+    --glow-cyan: 0 0 30px rgba(0, 245, 255, 0.4);
+    --glow-purple: 0 0 30px rgba(180, 0, 255, 0.4);
+    --glow-pink: 0 0 30px rgba(255, 0, 144, 0.4);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-deep);
+    color: var(--text-bright);
+    font-family: 'Rajdhani', sans-serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ─── GRID OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg-deep); }
+  ::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 2px; }
+
+  /* ══════════════════════════════════════
+     NAVBAR
+  ══════════════════════════════════════ */
+  .navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    background: rgba(4, 6, 16, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: var(--text-bright);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nav-logo span {
+    color: var(--cyan);
+    text-shadow: var(--glow-cyan);
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    border: 2px solid var(--cyan);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--glow-cyan);
+    font-size: 14px;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--text-mid);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0; right: 0;
+    height: 1px;
+    background: var(--cyan);
+    transform: scaleX(0);
+    transition: transform 0.2s;
+  }
+  .nav-links a:hover { color: var(--cyan); }
+  .nav-links a:hover::after { transform: scaleX(1); }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+    padding: 8px 20px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    box-shadow: var(--glow-cyan);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 100%);
+    border: none;
+    color: var(--bg-deep);
+    padding: 9px 22px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    box-shadow: 0 0 20px rgba(0,245,255,0.3);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 0 35px rgba(0,245,255,0.6);
+    transform: translateY(-1px);
+  }
+
+  .nav-ping {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: ping-pulse 2s ease-in-out infinite;
+  }
+  @keyframes ping-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--green); }
+    50% { opacity: 0.5; box-shadow: 0 0 16px var(--green); }
+  }
+
+  /* ══════════════════════════════════════
+     NAVBAR RESPONSIVE
+  ══════════════════════════════════════ */
+
+  /* Desktop-only elemanlar: ≥ 900px'de göster */
+  .nav-desktop-only {
+    display: flex;
+  }
+
+  /* Mobil sağ taraf: varsayılan gizli */
+  .nav-mobile-right {
+    display: none;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* Hamburger butonu */
+  .hamburger-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    padding: 8px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .hamburger-btn:hover {
+    border-color: var(--cyan);
+    box-shadow: 0 0 12px rgba(0,245,255,0.3);
+  }
+
+  .ham-line {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--text-mid);
+    border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s, background 0.2s;
+    transform-origin: center;
+  }
+  .ham-line.open { background: var(--cyan); }
+  .ham-line.open:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .ham-line.open:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .ham-line.open:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Mobil menü overlay */
+  .mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(4,6,16,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 998;
+  }
+
+  /* Mobil menü drawer */
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: min(320px, 85vw);
+    height: 100vh;
+    background: rgba(8,13,26,0.98);
+    border-left: 1px solid var(--border);
+    z-index: 999;
+    transition: right 0.35s cubic-bezier(0.77,0,0.175,1);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .mobile-menu.open { right: 0; }
+
+  .mobile-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    min-height: 64px;
+  }
+
+  .mobile-menu-close {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .mobile-menu-close:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+
+  .mobile-menu-body {
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    flex: 1;
+  }
+
+  .mobile-esles {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .mobile-nav-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .mobile-nav-links li a {
+    display: block;
+    padding: 12px 16px;
+    color: var(--text-mid);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .mobile-nav-links li a:hover {
+    color: var(--cyan);
+    background: rgba(0,245,255,0.06);
+    border-color: rgba(0,245,255,0.15);
+  }
+
+  .mobile-auth-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ≤ 900px: mobil mod */
+  @media (max-width: 900px) {
+    .nav-desktop-only {
+      display: none !important;
+    }
+    .nav-mobile-right {
+      display: flex;
+    }
+    .navbar {
+      padding: 0 20px;
+    }
+  }
+
+  /* ══════════════════════════════════════
+     HERO SLIDER
+  ══════════════════════════════════════ */
+  .slider-wrapper {
+    position: relative;
+    width: 100%;
+    height: 75vh;
+    min-height: 500px;
+    overflow: hidden;
+    margin-top: 64px;
+  }
+
+  .slides {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.7s cubic-bezier(0.77, 0, 0.175, 1);
+  }
+
+  .slide {
+    min-width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .slide-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.05);
+    transition: transform 8s ease-in-out;
+  }
+  .slide.active .slide-bg { transform: scale(1); }
+
+  .slide-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(4,6,16,0.85) 0%,
+      rgba(4,6,16,0.5) 50%,
+      rgba(4,6,16,0.8) 100%
+    );
+  }
+
+  /* Slide specific backgrounds */
+  .slide-1 .slide-bg {
+    background: linear-gradient(135deg, #0a0020 0%, #040610 40%, #001a20 100%);
+  }
+  .slide-1 .slide-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 70% 30%, rgba(0,245,255,0.2) 0%, transparent 50%),
+      radial-gradient(circle at 20% 70%, rgba(180,0,255,0.2) 0%, transparent 50%);
+  }
+
+  .slide-2 .slide-bg {
+    background: linear-gradient(135deg, #0a0010 0%, #040610 40%, #100020 100%);
+  }
+  .slide-2 .slide-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 50%, rgba(255,0,144,0.25) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255,224,0,0.15) 0%, transparent 40%);
+  }
+
+  .slide-3 .slide-bg {
+    background: linear-gradient(135deg, #001a00 0%, #040610 40%, #0a001a 100%);
+  }
+  .slide-3 .slide-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 60% 60%, rgba(0,255,135,0.2) 0%, transparent 50%),
+      radial-gradient(circle at 10% 30%, rgba(0,245,255,0.15) 0%, transparent 40%);
+  }
+
+  /* Decorative elements */
+  .slide-deco {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .slide-deco .hex {
+    position: absolute;
+    border: 1px solid;
+    opacity: 0.15;
+    animation: hex-rotate 20s linear infinite;
+  }
+  .slide-deco .hex-1 {
+    width: 400px; height: 400px;
+    border-color: var(--cyan);
+    border-radius: 50%;
+    top: -100px; right: 5%;
+    animation-duration: 25s;
+  }
+  .slide-deco .hex-2 {
+    width: 250px; height: 250px;
+    border-color: var(--purple);
+    border-radius: 50%;
+    top: 50px; right: 8%;
+    animation-duration: 18s;
+    animation-direction: reverse;
+  }
+  .slide-deco .hex-3 {
+    width: 120px; height: 120px;
+    border-color: var(--cyan);
+    border-radius: 50%;
+    top: 150px; right: 12%;
+    animation-duration: 12s;
+  }
+
+  @keyframes hex-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Number decorations */
+  .slide-number-deco {
+    position: absolute;
+    bottom: 20px;
+    right: 40px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 120px;
+    font-weight: 900;
+    opacity: 0.04;
+    letter-spacing: -5px;
+    color: var(--cyan);
+    user-select: none;
+    line-height: 1;
+  }
+
+  .slide-content {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    padding: 0 60px;
+    text-align: left;
+  }
+
+  .slide-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--cyan-dim);
+    border: 1px solid rgba(0,245,255,0.3);
+    color: var(--cyan);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 2px;
+    margin-bottom: 24px;
+    animation: fadeInUp 0.5s ease both;
+  }
+  .slide-tag .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+    animation: ping-pulse 1.5s infinite;
+  }
+
+  .slide-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(36px, 5vw, 72px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -1px;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.6s 0.1s ease both;
+  }
+  .slide-title .accent-cyan { color: var(--cyan); text-shadow: 0 0 40px var(--cyan); }
+  .slide-title .accent-purple { color: var(--purple); text-shadow: 0 0 40px var(--purple); }
+  .slide-title .accent-pink { color: var(--pink); text-shadow: 0 0 40px var(--pink); }
+  .slide-title .accent-green { color: var(--green); text-shadow: 0 0 40px var(--green); }
+
+  .slide-desc {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text-mid);
+    max-width: 480px;
+    line-height: 1.6;
+    margin-bottom: 36px;
+    animation: fadeInUp 0.6s 0.2s ease both;
+  }
+
+  .slide-cta {
+    display: flex;
+    gap: 14px;
+    animation: fadeInUp 0.6s 0.3s ease both;
+  }
+
+  .cta-main {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--cyan);
+    color: var(--bg-deep);
+    border: none;
+    padding: 14px 30px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 3px;
+    box-shadow: 0 0 30px rgba(0,245,255,0.5);
+    transition: all 0.25s;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .cta-main:hover {
+    box-shadow: 0 0 50px rgba(0,245,255,0.8);
+    transform: translateY(-2px);
+  }
+
+  .cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: var(--text-mid);
+    border: 1px solid var(--border);
+    padding: 14px 24px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.25s;
+  }
+  .cta-secondary:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Arrow buttons */
+  .slider-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 52px; height: 52px;
+    background: rgba(4,6,16,0.8);
+    border: 1px solid rgba(0,245,255,0.25);
+    color: var(--cyan);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    transition: all 0.25s;
+    border-radius: 4px;
+    clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  }
+  .slider-arrow:hover {
+    background: var(--cyan-dim);
+    border-color: var(--cyan);
+    box-shadow: var(--glow-cyan);
+    transform: translateY(-50%) scale(1.05);
+  }
+  .slider-arrow.prev { left: 20px; }
+  .slider-arrow.next { right: 20px; }
+
+  /* Dots */
+  .slider-dots {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 1px solid transparent;
+  }
+  .dot.active {
+    width: 28px;
+    border-radius: 3px;
+    background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan);
+    border-color: var(--cyan);
+  }
+
+  /* Slide progress bar */
+  .slider-progress {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    box-shadow: 0 0 8px var(--cyan);
+    z-index: 11;
+    animation: progress-bar 5s linear infinite;
+  }
+  @keyframes progress-bar {
+    from { width: 0%; }
+    to { width: 100%; }
+  }
+
+  /* ══════════════════════════════════════
+     HERO SECTION (below slider)
+  ══════════════════════════════════════ */
+  .hero-below {
+    position: relative;
+    padding: 0 40px 60px;
+    background: linear-gradient(180deg, rgba(4,6,16,0.95) 0%, var(--bg-deep) 100%);
+  }
+
+  .hero-headline-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 40px 0 36px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .hero-main-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(32px, 6vw, 88px);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -2px;
+    color: var(--text-bright);
+  }
+  .hero-main-title .line2 {
+    display: block;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+  }
+  .hero-main-title .slash {
+    color: var(--cyan);
+    text-shadow: var(--glow-cyan);
+    margin: 0 12px;
+  }
+
+  .hero-stats-inline {
+    display: flex;
+    gap: 36px;
+  }
+  .stat-item {
+    text-align: right;
+  }
+  .stat-number {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--cyan);
+    text-shadow: var(--glow-cyan);
+    display: block;
+  }
+  .stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* Search area */
+  .hero-search-area {
+    padding: 36px 0 0;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .search-box {
+    position: relative;
+  }
+  .search-box input {
+    width: 100%;
+    background: rgba(10, 15, 35, 0.9);
+    border: 1px solid var(--border);
+    color: var(--text-bright);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 16px 20px 16px 52px;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .search-box input::placeholder { color: var(--text-dim); }
+  .search-box input:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 1px var(--cyan), var(--glow-cyan);
+  }
+  .search-icon {
+    position: absolute;
+    left: 18px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--cyan);
+    font-size: 18px;
+    opacity: 0.7;
+  }
+
+  .filter-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+    padding: 16px 24px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { border-color: var(--purple); color: var(--purple); }
+
+  .find-btn {
+    background: linear-gradient(135deg, var(--cyan) 0%, #0099cc 100%);
+    border: none;
+    color: var(--bg-deep);
+    padding: 16px 32px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    box-shadow: 0 0 25px rgba(0,245,255,0.4);
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+  .find-btn:hover {
+    box-shadow: 0 0 45px rgba(0,245,255,0.7);
+    transform: translateY(-2px);
+  }
+
+  /* Info cards row */
+  .info-cards {
+    display: flex;
+    gap: 16px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+
+  .info-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 12px 20px;
+    border-radius: 6px;
+    backdrop-filter: blur(10px);
+    flex: 1;
+    min-width: 180px;
+    transition: border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .info-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 60%, rgba(0,245,255,0.03) 100%);
+  }
+  .info-card:hover { border-color: rgba(0,245,255,0.3); }
+
+  .info-card-icon {
+    width: 42px; height: 42px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .icon-cyan { background: rgba(0,245,255,0.18); box-shadow: 0 0 16px rgba(0,245,255,0.35), inset 0 0 8px rgba(0,245,255,0.1); }
+  .icon-purple { background: rgba(180,0,255,0.18); box-shadow: 0 0 16px rgba(180,0,255,0.35), inset 0 0 8px rgba(180,0,255,0.1); }
+  .icon-green { background: rgba(0,255,135,0.18); box-shadow: 0 0 16px rgba(0,255,135,0.35), inset 0 0 8px rgba(0,255,135,0.1); }
+  .icon-pink { background: rgba(255,0,144,0.18); box-shadow: 0 0 16px rgba(255,0,144,0.35), inset 0 0 8px rgba(255,0,144,0.1); }
+  .icon-yellow { background: rgba(255,224,0,0.18); box-shadow: 0 0 16px rgba(255,224,0,0.35), inset 0 0 8px rgba(255,224,0,0.1); }
+
+  .info-card-text .label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    display: block;
+  }
+  .info-card-text .value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-bright);
+    display: block;
+    margin-top: 2px;
+  }
+  .info-card-text .value.glow-cyan { color: var(--cyan); text-shadow: 0 0 12px rgba(0,245,255,0.5); }
+  .info-card-text .value.glow-green { color: var(--green); text-shadow: 0 0 12px rgba(0,255,135,0.5); }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,59,59,0.15);
+    border: 1px solid rgba(255,59,59,0.3);
+    color: var(--red);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 2px 7px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+    display: block;
+  }
+  .live-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--red);
+    display: inline-block;
+    margin-right: 4px;
+    box-shadow: 0 0 5px var(--red);
+    animation: ping-pulse 1s infinite;
+  }
+
+  /* ══════════════════════════════════════
+     SECTION: POPULAR GAMES
+  ══════════════════════════════════════ */
+  .section {
+    padding: 80px 40px;
+    position: relative;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+  .badge-cyan {
+    background: var(--cyan-dim);
+    border-color: rgba(0,245,255,0.35);
+    color: var(--cyan);
+  }
+  .badge-purple {
+    background: var(--purple-dim);
+    border-color: rgba(180,0,255,0.35);
+    color: var(--purple);
+  }
+  .badge-pink {
+    background: rgba(255,0,144,0.12);
+    border-color: rgba(255,0,144,0.35);
+    color: var(--pink);
+  }
+  .badge-green {
+    background: rgba(0,255,135,0.1);
+    border-color: rgba(0,255,135,0.3);
+    color: var(--green);
+  }
+
+  .section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(22px, 3vw, 36px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+  .section-count {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+
+  /* Game cards */
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .game-card {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    aspect-ratio: 3/4;
+    background: var(--bg-card);
+  }
+  .game-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: var(--cyan);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 20px rgba(0,245,255,0.15);
+  }
+  .game-card:hover .game-overlay { opacity: 1; }
+  .game-card:hover .game-join-btn { transform: translateY(0); opacity: 1; }
+
+  .game-image {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .game-bg {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Fake game backgrounds */
+  .game-bg-1 { background: linear-gradient(135deg, #0a001a 0%, #200040 50%, #000a1a 100%); }
+  .game-bg-2 { background: linear-gradient(135deg, #001a0a 0%, #003020 50%, #001005 100%); }
+  .game-bg-3 { background: linear-gradient(135deg, #1a0000 0%, #400010 50%, #0a000a 100%); }
+  .game-bg-4 { background: linear-gradient(135deg, #000a1a 0%, #002040 50%, #00040a 100%); }
+  .game-bg-5 { background: linear-gradient(135deg, #1a1000 0%, #302000 50%, #100800 100%); }
+  .game-bg-6 { background: linear-gradient(135deg, #0a0a00 0%, #1a1a00 50%, #050500 100%); }
+
+  .game-deco {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+    opacity: 0.15;
+    user-select: none;
+  }
+
+  .game-gradient {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60%;
+    background: linear-gradient(0deg, var(--bg-deep) 0%, transparent 100%);
+  }
+
+  .game-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,245,255,0.05);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .game-info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 16px;
+  }
+  .game-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .game-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .game-players {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+  .game-genre-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    background: rgba(0,245,255,0.12);
+    color: var(--cyan);
+    border: 1px solid rgba(0,245,255,0.2);
+  }
+
+  .game-join-btn {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: var(--cyan);
+    color: var(--bg-deep);
+    border: none;
+    padding: 7px 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-radius: 3px;
+    cursor: pointer;
+    transform: translateY(-10px);
+    opacity: 0;
+    transition: all 0.25s;
+  }
+
+  .game-rank {
+    position: absolute;
+    top: 14px; left: 14px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--yellow);
+    background: rgba(255,224,0,0.12);
+    border: 1px solid rgba(255,224,0,0.25);
+    padding: 3px 8px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+  }
+
+  /* ══════════════════════════════════════
+     SECTION: WORKFLOW
+  ══════════════════════════════════════ */
+  .workflow-section {
+    background: linear-gradient(180deg, var(--bg-deep) 0%, rgba(0,245,255,0.02) 50%, var(--bg-deep) 100%);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    position: relative;
+  }
+  .workflow-grid::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.2;
+    transform: translateY(-50%);
+  }
+
+  .workflow-step {
+    padding: 40px 32px;
+    position: relative;
+    border-right: 1px solid var(--border);
+    transition: background 0.3s;
+  }
+  .workflow-step:last-child { border-right: none; }
+  .workflow-step:hover { background: rgba(0,245,255,0.02); }
+
+  .step-number {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(0,245,255,0.2);
+    line-height: 1;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .step-icon-wrap {
+    width: 56px; height: 56px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    margin-bottom: 20px;
+    position: relative;
+    background: var(--bg-card);
+    transition: all 0.3s;
+  }
+  .workflow-step:hover .step-icon-wrap {
+    border-color: var(--cyan);
+    box-shadow: var(--glow-cyan);
+  }
+
+  .step-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .step-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ══════════════════════════════════════
+     SECTION: COMMUNITY FEED
+  ══════════════════════════════════════ */
+  .community-section { background: var(--bg-deep); }
+
+  .feed-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+  }
+
+  .feed-main {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .feed-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feed-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--cyan);
+    transform: scaleY(0);
+    transition: transform 0.25s;
+  }
+  .feed-item:hover { border-color: rgba(0,245,255,0.25); transform: translateX(4px); }
+  .feed-item:hover::before { transform: scaleY(1); }
+
+  .feed-avatar {
+    width: 46px; height: 46px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    font-weight: 700;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+  }
+
+  .feed-content { flex: 1; }
+  .feed-user-name {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 3px;
+  }
+  .feed-message {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+  .feed-tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .feed-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+  .tag-cyan { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(0,245,255,0.25); }
+  .tag-purple { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(180,0,255,0.25); }
+  .tag-pink { background: rgba(255,0,144,0.1); color: var(--pink); border: 1px solid rgba(255,0,144,0.25); }
+  .tag-green { background: rgba(0,255,135,0.1); color: var(--green); border: 1px solid rgba(0,255,135,0.25); }
+
+  .feed-meta {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .feed-time {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+  .feed-ping {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    color: var(--green);
+    margin-top: 4px;
+  }
+
+  /* Side widget */
+  .feed-side {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .side-widget {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .widget-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .widget-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .online-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .online-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .online-avatar {
+    width: 36px; height: 36px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .online-name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .online-game {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .online-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+  }
+
+  .leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .lb-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .lb-item:last-child { border-bottom: none; }
+  .lb-rank {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    width: 24px;
+    color: var(--text-dim);
+  }
+  .lb-rank.gold { color: var(--yellow); text-shadow: 0 0 8px rgba(255,224,0,0.5); }
+  .lb-rank.silver { color: #c0c0c0; }
+  .lb-rank.bronze { color: #cd7f32; }
+  .lb-name { flex: 1; font-size: 13px; font-weight: 600; }
+  .lb-score {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    color: var(--cyan);
+  }
+
+  /* ══════════════════════════════════════
+     FOOTER
+  ══════════════════════════════════════ */
+  .footer {
+    position: relative;
+    padding: 80px 40px 40px;
+    border-top: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .footer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+  }
+
+  .footer-bg-text {
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(80px, 18vw, 220px);
+    font-weight: 900;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.03);
+    user-select: none;
+    pointer-events: none;
+    letter-spacing: -5px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 60px;
+    position: relative;
+  }
+
+  .footer-brand .nav-logo {
+    font-size: 26px;
+    margin-bottom: 20px;
+    display: inline-flex;
+  }
+  .footer-tagline {
+    font-size: 16px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 28px;
+    max-width: 300px;
+  }
+
+  .social-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .social-link {
+    width: 44px; height: 44px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 18px;
+    transition: all 0.2s;
+    background: var(--bg-card);
+    position: relative;
+    overflow: hidden;
+  }
+  .social-link:hover { color: var(--text-bright); border-color: var(--cyan); box-shadow: var(--glow-cyan); }
+  .social-link.ig:hover { border-color: var(--pink); box-shadow: 0 0 20px rgba(255,0,144,0.4); color: var(--pink); }
+  .social-link.yt:hover { border-color: #ff0000; box-shadow: 0 0 20px rgba(255,0,0,0.4); color: #ff4040; }
+  .social-link.tw:hover { border-color: var(--purple); box-shadow: var(--glow-purple); color: var(--purple); }
+  .social-link.fb:hover { border-color: #1877f2; box-shadow: 0 0 20px rgba(24,119,242,0.4); color: #1877f2; }
+  .social-link.x-tw:hover { border-color: var(--text-bright); box-shadow: 0 0 20px rgba(255,255,255,0.2); color: var(--text-bright); }
+
+  .footer-col-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 20px;
+  }
+  .footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    list-style: none;
+  }
+  .footer-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .footer-links a:hover { color: var(--cyan); }
+
+  .footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+    position: relative;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-copy {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+  .footer-legal {
+    display: flex;
+    gap: 24px;
+  }
+  .footer-legal a {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-decoration: none;
+    letter-spacing: 1px;
+    transition: color 0.2s;
+  }
+  .footer-legal a:hover { color: var(--cyan); }
+
+  .footer-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  /* ══════════════════════════════════════
+     MOBILE RESPONSIVE
+  ══════════════════════════════════════ */
+  @media (max-width: 900px) {
+    .navbar { padding: 0 20px; }
+    .nav-links { display: none; }
+    .hero-below { padding: 0 20px 40px; }
+    .hero-search-area { grid-template-columns: 1fr; }
+    .hero-stats-inline { gap: 20px; }
+    .hero-headline-bar { flex-direction: column; align-items: flex-start; }
+    .section { padding: 50px 20px; }
+    .games-grid { grid-template-columns: repeat(2, 1fr); }
+    .workflow-grid { grid-template-columns: 1fr 1fr; }
+    .workflow-step { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .workflow-step:nth-child(even) { border-right: none; }
+    .feed-grid { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
+    .slide-content { padding: 0 30px; }
+    .info-cards { gap: 10px; }
+    .info-card { min-width: 140px; }
+  }
+
+  @media (max-width: 600px) {
+    .hero-main-title { font-size: 32px; }
+    .games-grid { grid-template-columns: repeat(2, 1fr); }
+    .workflow-grid { grid-template-columns: 1fr; }
+    .workflow-step { border-right: none; }
+    .footer-top { grid-template-columns: 1fr; gap: 32px; }
+    .slide-title { font-size: 30px; }
+    .nav-actions .btn-ghost { display: none; }
+  }
+  /* ── NAV CENTER ESLES BUTTON ── */
+  .navbar {
+    display: grid;
+    grid-template-columns: auto 1fr auto 1fr auto;
+    align-items: center;
+    gap: 0;
+  }
+  .nav-links-left, .nav-links-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    list-style: none;
+    justify-content: center;
+  }
+  .nav-esles-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid rgba(0,245,255,0.4);
+    color: var(--cyan);
+    padding: 0 20px;
+    height: 40px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    cursor: pointer;
+    border-radius: 4px;
+    overflow: visible;
+    transition: all 0.25s;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    justify-self: center;
+  }
+  .nav-esles-btn::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    opacity: 0;
+    transition: opacity 0.25s;
+    z-index: -1;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .nav-esles-btn:hover {
+    color: var(--bg-deep);
+    border-color: transparent;
+    box-shadow: 0 0 30px rgba(0,245,255,0.5), 0 0 60px rgba(180,0,255,0.3);
+    transform: scale(1.04);
+  }
+  .nav-esles-btn:hover::before { opacity: 1; }
+  .nav-esles-icon { font-size: 16px; }
+  .nav-esles-count {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: rgba(0,245,255,0.15);
+    border: 1px solid rgba(0,245,255,0.25);
+    padding: 2px 6px;
+    border-radius: 10px;
+    color: var(--cyan);
+  }
+  .nav-esles-btn:hover .nav-esles-count { background: rgba(4,6,16,0.3); border-color: rgba(4,6,16,0.3); color: var(--bg-deep); }
+  .nav-esles-pulse {
+    position: absolute;
+    top: -4px; right: -4px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+    animation: ping-pulse 1.5s ease-in-out infinite;
+  }
+
+  /* ── FILTER ACTIVE DOT ── */
+  .filter-active-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+    display: none;
+  }
+  .filter-active-dot.visible { display: inline-block; }
+
+  /* ── ACTIVE FILTERS BAR ── */
+  .active-filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    min-height: 0;
+  }
+  .active-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--cyan-dim);
+    border: 1px solid rgba(0,245,255,0.3);
+    color: var(--cyan);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .active-filter-chip:hover { background: rgba(255,59,59,0.1); border-color: var(--red); color: var(--red); }
+  .active-filter-chip .remove-icon { font-size: 13px; line-height: 1; }
+
+  /* ══ FILTER PANEL ══ */
+  .filter-panel-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1500;
+    background: rgba(4,6,16,0.7);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .filter-panel-overlay.open { opacity: 1; pointer-events: all; }
+
+  .filter-panel {
+    position: fixed;
+    top: 64px; right: 0;
+    bottom: 0;
+    width: 400px;
+    background: var(--bg-dark);
+    border-left: 1px solid var(--border);
+    z-index: 1501;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.77,0,0.175,1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .filter-panel.open { transform: translateX(0); }
+
+  .fp-header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .fp-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--cyan);
+  }
+  .fp-close {
+    width: 30px; height: 30px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .fp-close:hover { background: rgba(255,59,59,0.12); border-color: var(--red); color: var(--red); }
+
+  .fp-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    scrollbar-width: thin;
+  }
+
+  .fp-group { display: flex; flex-direction: column; gap: 12px; }
+  .fp-group-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .fp-group-label::after { content: ''; flex:1; height:1px; background: var(--border); }
+
+  .fp-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .fp-chip {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 7px 14px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .fp-chip:hover { border-color: var(--cyan); color: var(--cyan); }
+  .fp-chip.selected {
+    background: var(--cyan-dim);
+    border-color: var(--cyan);
+    color: var(--cyan);
+    box-shadow: 0 0 10px rgba(0,245,255,0.15);
+  }
+
+  .fp-range-wrap { display: flex; flex-direction: column; gap: 8px; }
+  .fp-range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+  .fp-range-val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
+    color: var(--cyan);
+    text-align: center;
+    letter-spacing: 1px;
+  }
+  .fp-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan) var(--pct, 50%), rgba(255,255,255,0.1) var(--pct, 50%));
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  .fp-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--bg-deep);
+    border: 2px solid var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+    cursor: pointer;
+  }
+
+  .fp-footer {
+    padding: 20px 28px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .fp-clear-btn {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  .fp-clear-btn:hover { border-color: var(--red); color: var(--red); }
+  .fp-apply-btn {
+    flex: 2;
+    background: linear-gradient(135deg, var(--cyan), #0099cc);
+    border: none;
+    color: var(--bg-deep);
+    padding: 12px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(0,245,255,0.3);
+    transition: all 0.2s;
+  }
+  .fp-apply-btn:hover { box-shadow: 0 0 35px rgba(0,245,255,0.5); transform: translateY(-1px); }
+
+  /* ══ MATCH MODAL ══ */
+  .match-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(4,6,16,0.9);
+    backdrop-filter: blur(16px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .match-overlay.open { opacity: 1; pointer-events: all; }
+
+  .match-modal {
+    width: 100%;
+    max-width: 620px;
+    max-height: 92vh;
+    background: var(--bg-dark);
+    border: 1px solid rgba(0,245,255,0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 80px rgba(0,245,255,0.08), 0 40px 80px rgba(0,0,0,0.7);
+    transform: scale(0.96) translateY(20px);
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    display: flex;
+    flex-direction: column;
+  }
+  .match-overlay.open .match-modal { transform: scale(1) translateY(0); }
+
+  .mm-header {
+    padding: 28px 32px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, rgba(0,245,255,0.04) 0%, transparent 100%);
+    flex-shrink: 0;
+  }
+  .mm-header-left { display: flex; flex-direction: column; gap: 4px; }
+  .mm-pretitle {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mm-pretitle::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+  }
+  .mm-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .mm-close {
+    width: 34px; height: 34px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .mm-close:hover { background: rgba(255,59,59,0.12); border-color: var(--red); color: var(--red); }
+
+  /* Steps indicator */
+  .mm-steps {
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .mm-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 0;
+    flex: 1;
+    position: relative;
+    cursor: pointer;
+  }
+  .mm-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%; transform: translateY(-50%);
+    width: 60%;
+    height: 1px;
+    background: var(--border);
+  }
+  .mm-step-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .mm-step.active .mm-step-num { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 10px rgba(0,245,255,0.3); }
+  .mm-step.done .mm-step-num { background: var(--cyan); color: var(--bg-deep); border-color: var(--cyan); }
+  .mm-step-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    transition: color 0.3s;
+  }
+  .mm-step.active .mm-step-label { color: var(--text-bright); }
+
+  .mm-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 32px;
+    scrollbar-width: thin;
+  }
+
+  .mm-step-content { display: none; }
+  .mm-step-content.active { display: block; }
+
+  .mm-section { margin-bottom: 24px; }
+  .mm-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .mm-section-title::after { content: ''; flex:1; height:1px; background: var(--border); }
+
+  .mm-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .mm-chip {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .mm-chip:hover { border-color: var(--cyan); color: var(--cyan); }
+  .mm-chip.sel { background: var(--cyan-dim); border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 10px rgba(0,245,255,0.12); }
+  .mm-chip.sel-purple { background: var(--purple-dim); border-color: var(--purple); color: var(--purple); }
+  .mm-chip.sel-green { background: rgba(0,255,135,0.1); border-color: var(--green); color: var(--green); }
+
+  /* Searching animation */
+  .mm-searching {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    gap: 24px;
+  }
+  .mm-searching.active { display: flex; }
+  .search-radar {
+    width: 120px; height: 120px;
+    position: relative;
+  }
+  .radar-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid var(--cyan);
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%) scale(0);
+    opacity: 0;
+  }
+  .radar-ring:nth-child(1) { width: 40px; height: 40px; animation: radar-pulse 2s 0s ease-out infinite; }
+  .radar-ring:nth-child(2) { width: 70px; height: 70px; animation: radar-pulse 2s 0.5s ease-out infinite; }
+  .radar-ring:nth-child(3) { width: 100px; height: 100px; animation: radar-pulse 2s 1s ease-out infinite; }
+  .radar-ring:nth-child(4) { width: 120px; height: 120px; animation: radar-pulse 2s 1.5s ease-out infinite; }
+  @keyframes radar-pulse {
+    0% { transform: translate(-50%,-50%) scale(0); opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(1); opacity: 0; }
+  }
+  .radar-center {
+    position: absolute;
+    width: 18px; height: 18px;
+    background: var(--cyan);
+    border-radius: 50%;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    box-shadow: 0 0 20px var(--cyan);
+    animation: ping-pulse 1s ease-in-out infinite;
+  }
+  .searching-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--cyan);
+    text-align: center;
+  }
+  .searching-sub {
+    font-size: 13px;
+    color: var(--text-dim);
+    text-align: center;
+    letter-spacing: 1px;
+  }
+  .searching-timer {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--text-bright);
+    text-shadow: 0 0 20px rgba(0,245,255,0.5);
+  }
+
+  /* Match found */
+  .mm-found {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 32px 0;
+    text-align: center;
+  }
+  .mm-found.active { display: flex; }
+  .found-icon {
+    font-size: 60px;
+    animation: fadeInUp 0.4s ease;
+  }
+  .found-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--green);
+    text-shadow: 0 0 30px var(--green);
+    letter-spacing: 2px;
+    animation: fadeInUp 0.4s 0.1s ease both;
+  }
+  .found-players {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeInUp 0.4s 0.2s ease both;
+  }
+  .found-player {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    text-align: center;
+    min-width: 100px;
+  }
+  .found-player .fp-av {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    margin: 0 auto 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .found-player .fp-nm { font-size: 13px; font-weight: 700; }
+  .found-player .fp-rk { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+  .mm-footer {
+    padding: 20px 32px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .mm-back-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 12px 20px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  .mm-back-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+  .mm-next-btn {
+    flex: 1;
+    background: linear-gradient(135deg, var(--cyan), #0099cc);
+    border: none;
+    color: var(--bg-deep);
+    padding: 12px 24px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(0,245,255,0.3);
+    transition: all 0.25s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .mm-next-btn:hover { box-shadow: 0 0 40px rgba(0,245,255,0.5); transform: translateY(-1px); }
+
+  /* ══ PLAYERS MODULE ══ */
+  .players-module-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    align-items: start;
+  }
+  .player-cards-col { overflow: hidden; }
+  .player-card-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .player-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .player-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,245,255,0.03) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .player-card:hover { border-color: rgba(0,245,255,0.3); transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 20px rgba(0,245,255,0.08); }
+  .player-card:hover::before { opacity: 1; }
+  .pc-header {
+    position: relative;
+    width: 48px;
+  }
+  .pc-avatar {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bright);
+  }
+  .pc-online-ring {
+    position: absolute;
+    bottom: -2px; right: -2px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--green);
+    border: 2px solid var(--bg-dark);
+    box-shadow: 0 0 6px var(--green);
+    animation: ping-pulse 2s ease-in-out infinite;
+  }
+  .pc-body { display: flex; flex-direction: column; gap: 4px; }
+  .pc-name { font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+  .pc-rank { font-size: 11px; font-weight: 600; }
+  .pc-game { font-size: 11px; color: var(--text-dim); }
+  .pc-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 2px; }
+  .pc-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 2px 6px;
+    border-radius: 2px;
+  }
+  .pc-invite-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(0,245,255,0.25);
+    color: var(--cyan);
+    padding: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: auto;
+  }
+  .pc-invite-btn:hover { background: var(--cyan-dim); border-color: var(--cyan); box-shadow: 0 0 12px rgba(0,245,255,0.2); }
+
+  .module-side { display: flex; flex-direction: column; gap: 16px; }
+
+  .mini-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .mini-stat {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    text-align: center;
+  }
+  .mini-stat-val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .mini-stat-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .side-cta-card {
+    background: linear-gradient(135deg, rgba(0,245,255,0.06) 0%, rgba(180,0,255,0.06) 100%);
+    border: 1px solid rgba(0,245,255,0.2);
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .side-cta-glow {
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,245,255,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  @media (max-width: 1100px) {
+    .navbar { grid-template-columns: auto auto auto auto auto; }
+    .player-card-row { grid-template-columns: repeat(2,1fr); }
+  }
+  @media (max-width: 900px) {
+    .navbar { display: flex; }
+    .nav-links-left, .nav-links-right { display: none; }
+    .nav-esles-btn { margin: 0 auto; }
+    .players-module-grid { grid-template-columns: 1fr; }
+    .module-side { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .filter-panel { width: 100%; top: 64px; }
+  }
+  @media (max-width: 600px) {
+    .player-card-row { grid-template-columns: repeat(2,1fr); }
+    .module-side { grid-template-columns: 1fr; }
+    .mm-steps { padding: 0 16px; }
+    .mm-step-label { display: none; }
+    .mm-header, .mm-body, .mm-footer { padding-left: 20px; padding-right: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ NAVBAR ═══════════════════════════════════ -->
+<nav class="navbar">
+  <a href="#" class="nav-logo">
+    <div class="logo-icon">&#x2B21;</div>
+    SQUAD<span>X</span>
+  </a>
+
+  <ul class="nav-links nav-links-left">
+    <li><a href="#">Kesfet</a></li>
+    <li><a href="#">Oyunlar</a></li>
+  </ul>
+
+  <button class="nav-esles-btn" id="openMatchModal">
+    <span class="nav-esles-pulse"></span>
+    <span class="nav-esles-icon">&#x26A1;</span>
+    <span class="nav-esles-text">ESLES</span>
+    <span class="nav-esles-count">2.347</span>
+  </button>
+
+  <ul class="nav-links nav-links-right">
+    <li><a href="#">Liderlik</a></li>
+    <li><a href="#">Topluluk</a></li>
+  </ul>
+
+  <div class="nav-actions">
+    <div class="nav-ping" title="2.347 cevrimici"></div>
+    <button class="btn-ghost" id="openLogin">Giris Yap</button>
+    <button class="btn-primary" id="openRegister">Kaydol</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════ HERO SLIDER ═══════════════════════════════════ -->
+<div class="slider-wrapper">
+  <div class="slides" id="slides">
+
+    <!-- Slide 1 -->
+    <div class="slide slide-1 active">
+      <div class="slide-bg"></div>
+      <div class="slide-overlay"></div>
+      <div class="slide-deco">
+        <div class="hex hex-1"></div>
+        <div class="hex hex-2"></div>
+        <div class="hex hex-3"></div>
+      </div>
+      <div class="slide-number-deco">01</div>
+      <div class="slide-content">
+        <div class="slide-tag"><span class="dot"></span> Anlık Eşleşme Aktif</div>
+        <h1 class="slide-title">SAVAŞA<br/><span class="accent-cyan">HAZIR</span> MISIN</h1>
+        <p class="slide-desc">Saniyeler içinde sana uygun takım arkadaşlarını bul. Seviye, bölge ve oyun tarzına göre akıllı eşleştirme.</p>
+        <div class="slide-cta">
+          <button class="cta-main">⚡ Squad Bul</button>
+          <button class="cta-secondary">▶ Nasıl Çalışır</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="slide slide-2">
+      <div class="slide-bg"></div>
+      <div class="slide-overlay"></div>
+      <div class="slide-deco">
+        <div class="hex hex-1"></div>
+        <div class="hex hex-2"></div>
+        <div class="hex hex-3"></div>
+      </div>
+      <div class="slide-number-deco">02</div>
+      <div class="slide-content">
+        <div class="slide-tag" style="color:var(--pink); background:rgba(255,0,144,0.1); border-color:rgba(255,0,144,0.3)"><span class="dot" style="background:var(--pink); box-shadow: 0 0 6px var(--pink)"></span> Akilli Eslestirme</div>
+        <h1 class="slide-title">SANA OZEL<br/><span class="accent-pink">KADRO</span></h1>
+        <p class="slide-desc">Rank, dil, oyun saati ve oyun tarzina gore AI destekli eslestirme. Hicbir yabanci, sadece takim arkadasi.</p>
+        <div class="slide-cta">
+          <button class="cta-main" style="background:var(--pink); box-shadow: 0 0 30px rgba(255,0,144,0.5)" id="slide2MatchBtn">&#x26A1; Hemen Esles</button>
+          <button class="cta-secondary">Nasil Calisir</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="slide slide-3">
+      <div class="slide-bg"></div>
+      <div class="slide-overlay"></div>
+      <div class="slide-deco">
+        <div class="hex hex-1"></div>
+        <div class="hex hex-2"></div>
+        <div class="hex hex-3"></div>
+      </div>
+      <div class="slide-number-deco">03</div>
+      <div class="slide-content">
+        <div class="slide-tag" style="color:var(--green); background:rgba(0,255,135,0.1); border-color:rgba(0,255,135,0.3)"><span class="dot" style="background:var(--green); box-shadow: 0 0 6px var(--green)"></span> Topluluk Canlı</div>
+        <h1 class="slide-title">TOPLULUK<br/><span class="accent-green">GÜCÜ</span></h1>
+        <p class="slide-desc">50,000+ aktif oyuncuya katıl. Discord entegrasyonu, klan sistemi ve gerçek zamanlı sesli iletişim.</p>
+        <div class="slide-cta">
+          <button class="cta-main" style="background:var(--green); box-shadow: 0 0 30px rgba(0,255,135,0.5)">🌐 Topluluğa Gir</button>
+          <button class="cta-secondary">Klan Kur</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Arrows -->
+  <button class="slider-arrow prev" id="prevBtn" aria-label="Önceki">&#8592;</button>
+  <button class="slider-arrow next" id="nextBtn" aria-label="Sonraki">&#8594;</button>
+
+  <!-- Dots -->
+  <div class="slider-dots" id="sliderDots">
+    <div class="dot active" data-index="0"></div>
+    <div class="dot" data-index="1"></div>
+    <div class="dot" data-index="2"></div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="slider-progress" id="sliderProgress"></div>
+</div>
+
+<!-- ═══════════════════════════════════ HERO BELOW ═══════════════════════════════════ -->
+<section class="hero-below">
+  <div class="hero-headline-bar">
+    <h2 class="hero-main-title">
+      OYUN OYNA <span class="slash">/</span>
+      <span class="line2">YALNIZ KALMA</span>
+    </h2>
+    <div class="hero-stats-inline">
+      <div class="stat-item">
+        <span class="stat-number" id="counter1">0</span>
+        <span class="stat-label">Aktif Oyuncu</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="counter2">0</span>
+        <span class="stat-label">Eslestirme/Gun</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="counter3">0</span>
+        <span class="stat-label">Desteklenen Oyun</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="hero-search-area">
+    <div class="search-box">
+      <span class="search-icon">&#x2315;</span>
+      <input type="text" id="heroSearch" placeholder="Oyun, oyuncu adi veya klan ara..."/>
+    </div>
+    <button class="filter-btn" id="openFilterPanel">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      Filtrele
+      <span class="filter-active-dot" id="filterActiveDot"></span>
+    </button>
+    <button class="find-btn" id="openMatchModal2">
+      <span>&#x26A1;</span> Hizli Esles
+    </button>
+  </div>
+
+  <!-- Active filters display -->
+  <div class="active-filters" id="activeFiltersBar"></div>
+
+  <!-- Info cards -->
+  <div class="info-cards">
+    <div class="info-card">
+      <div class="info-card-icon" style="background:rgba(255,59,59,0.18); box-shadow: 0 0 16px rgba(255,59,59,0.4);">&#x1F514;</div>
+      <div class="info-card-text">
+        <span class="label">Bildirim</span>
+        <span class="value">Canli Alarm</span>
+        <span class="live-badge"><span class="live-dot"></span>CANLI</span>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon icon-yellow">&#x26A1;</div>
+      <div class="info-card-text">
+        <span class="label">Hiz</span>
+        <span class="value glow-cyan">Yuksek Tempo</span>
+        <span style="font-size:11px; color:var(--text-dim); letter-spacing:1px;">Ort. eslestirme: 12 sn</span>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon icon-green">&#x1F3AE;</div>
+      <div class="info-card-text">
+        <span class="label">Durum</span>
+        <span class="value glow-green">Hazir Squad</span>
+        <span style="font-size:11px; color: var(--green); letter-spacing:1px;">847 hazir ekip</span>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon icon-cyan">&#x1F6E1;</div>
+      <div class="info-card-text">
+        <span class="label">Guvenlik</span>
+        <span class="value">Dogrulanmis</span>
+        <span style="font-size:11px; color:var(--text-dim); letter-spacing:1px;">Anti-troll sistemi aktif</span>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon icon-purple">&#x1F465;</div>
+      <div class="info-card-text">
+        <span class="label">Topluluk</span>
+        <span class="value">52.400+</span>
+        <span style="font-size:11px; color:var(--text-dim); letter-spacing:1px;">Kayitli oyuncu</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════ POPULAR GAMES ═══════════════════════════════════ -->
+<section class="section">
+  <div class="section-header">
+    <span class="section-badge badge-cyan">🎮 Popüler Oyunlar</span>
+    <h3 class="section-title">Şu An En Çok Oynananlar</h3>
+    <div class="section-line"></div>
+    <span class="section-count">128 / OYUN</span>
+  </div>
+
+  <div class="games-grid">
+    <div class="game-card">
+      <div class="game-bg game-bg-1">
+        <div class="game-deco">⚔</div>
+      </div>
+      <div class="game-gradient"></div>
+      <div class="game-overlay"></div>
+      <div class="game-rank">#1</div>
+      <button class="game-join-btn">KATIL</button>
+      <div class="game-info">
+        <div class="game-name">VALORANT</div>
+        <div class="game-meta">
+          <span class="game-players">🟢 12,847 çevrimiçi</span>
+          <span class="game-genre-tag">FPS</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-bg game-bg-2">
+        <div class="game-deco">🌿</div>
+      </div>
+      <div class="game-gradient"></div>
+      <div class="game-overlay"></div>
+      <div class="game-rank">#2</div>
+      <button class="game-join-btn">KATIL</button>
+      <div class="game-info">
+        <div class="game-name">PUBG</div>
+        <div class="game-meta">
+          <span class="game-players">🟢 9,321 çevrimiçi</span>
+          <span class="game-genre-tag">BR</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-bg game-bg-3">
+        <div class="game-deco">🔥</div>
+      </div>
+      <div class="game-gradient"></div>
+      <div class="game-overlay"></div>
+      <div class="game-rank">#3</div>
+      <button class="game-join-btn">KATIL</button>
+      <div class="game-info">
+        <div class="game-name">CS2</div>
+        <div class="game-meta">
+          <span class="game-players">🟢 8,650 çevrimiçi</span>
+          <span class="game-genre-tag">FPS</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-bg game-bg-4">
+        <div class="game-deco">⚡</div>
+      </div>
+      <div class="game-gradient"></div>
+      <div class="game-overlay"></div>
+      <div class="game-rank">#4</div>
+      <button class="game-join-btn">KATIL</button>
+      <div class="game-info">
+        <div class="game-name">LEAGUE OF LEGENDS</div>
+        <div class="game-meta">
+          <span class="game-players">🟢 7,200 çevrimiçi</span>
+          <span class="game-genre-tag">MOBA</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-bg game-bg-5">
+        <div class="game-deco">💀</div>
+      </div>
+      <div class="game-gradient"></div>
+      <div class="game-overlay"></div>
+      <button class="game-join-btn">KATIL</button>
+      <div class="game-info">
+        <div class="game-name">FORTNITE</div>
+        <div class="game-meta">
+          <span class="game-players">🟢 6,980 çevrimiçi</span>
+          <span class="game-genre-tag">BR</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-bg game-bg-6">
+        <div class="game-deco">🚀</div>
+      </div>
+      <div class="game-gradient"></div>
+      <div class="game-overlay"></div>
+      <button class="game-join-btn">KATIL</button>
+      <div class="game-info">
+        <div class="game-name">APEX LEGENDS</div>
+        <div class="game-meta">
+          <span class="game-players">🟢 5,140 çevrimiçi</span>
+          <span class="game-genre-tag">BR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════ WORKFLOW ═══════════════════════════════════ -->
+<section class="section workflow-section">
+  <div class="section-header">
+    <span class="section-badge badge-purple">⚡ Workflow</span>
+    <h3 class="section-title">4 Adımda Takımını Bul</h3>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="workflow-step">
+      <span class="step-number">01</span>
+      <div class="step-icon-wrap">🎮</div>
+      <div class="step-title">Oyununu Seç</div>
+      <p class="step-desc">128'den fazla desteklenen oyun arasından kendine uygun olanı seç. Birden fazla seçim yapabilirsin.</p>
+    </div>
+    <div class="workflow-step">
+      <span class="step-number">02</span>
+      <div class="step-icon-wrap">⚙</div>
+      <div class="step-title">Profilini Oluştur</div>
+      <p class="step-desc">Rank, bölge, dil ve oyun saatini belirle. Akıllı algoritmamız sana en uygun oyuncuları getirir.</p>
+    </div>
+    <div class="workflow-step">
+      <span class="step-number">03</span>
+      <div class="step-icon-wrap">⚡</div>
+      <div class="step-title">Anında Eşleş</div>
+      <p class="step-desc">Ortalama 12 saniyede takım arkadaşı bul. Gerçek zamanlı bildirimlerle hiçbir fırsatı kaçırma.</p>
+    </div>
+    <div class="workflow-step">
+      <span class="step-number">04</span>
+      <div class="step-icon-wrap">&#x1F91D;</div>
+      <div class="step-title">Takim Kur & Yuksel</div>
+      <p class="step-desc">Takim arkadaşlarınla sıralamalarda yuksel, klanını buyut, liderlik tablosunda adını tarihe yaz.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════ ONLINE PLAYERS MODULE ═══════════════════════════════════ -->
+<section class="section community-section">
+  <div class="section-header">
+    <span class="section-badge badge-green">&#x1F7E2; Cevrimici Oyuncular</span>
+    <h3 class="section-title">Simdi Eslesmeye Hazir</h3>
+    <div class="section-line"></div>
+    <span class="section-count" style="color:var(--green); text-shadow: 0 0 8px rgba(0,255,135,0.4);">&#x25CF; 2.347 CANLI</span>
+  </div>
+
+  <div class="players-module-grid">
+
+    <!-- LEFT: Player cards -->
+    <div class="player-cards-col">
+      <div class="player-card-row">
+
+        <div class="player-card" data-game="Valorant">
+          <div class="pc-header">
+            <div class="pc-avatar" style="background:linear-gradient(135deg,rgba(0,245,255,0.2),rgba(0,245,255,0.05));">NX</div>
+            <div class="pc-online-ring"></div>
+          </div>
+          <div class="pc-body">
+            <div class="pc-name">NeonX_Pro</div>
+            <div class="pc-rank" style="color:var(--yellow);">&#x2605; Diamond</div>
+            <div class="pc-game">Valorant</div>
+            <div class="pc-tags">
+              <span class="pc-tag" style="color:var(--cyan);">TR</span>
+              <span class="pc-tag" style="color:var(--green);">18+</span>
+              <span class="pc-tag" style="color:var(--purple);">Mikrofon</span>
+            </div>
+          </div>
+          <button class="pc-invite-btn" onclick="openMatchFromCard('NeonX_Pro','Valorant')">Davet Et</button>
+        </div>
+
+        <div class="player-card" data-game="CS2">
+          <div class="pc-header">
+            <div class="pc-avatar" style="background:linear-gradient(135deg,rgba(255,0,144,0.2),rgba(255,0,144,0.05));">VK</div>
+            <div class="pc-online-ring" style="border-color:var(--pink);"></div>
+          </div>
+          <div class="pc-body">
+            <div class="pc-name">VoidKiller</div>
+            <div class="pc-rank" style="color:#c0c0c0;">&#x25C6; Platinum</div>
+            <div class="pc-game">CS2</div>
+            <div class="pc-tags">
+              <span class="pc-tag" style="color:var(--cyan);">TR</span>
+              <span class="pc-tag" style="color:var(--pink);">16+</span>
+            </div>
+          </div>
+          <button class="pc-invite-btn" style="border-color:rgba(255,0,144,0.4); color:var(--pink);" onclick="openMatchFromCard('VoidKiller','CS2')">Davet Et</button>
+        </div>
+
+        <div class="player-card" data-game="PUBG">
+          <div class="pc-header">
+            <div class="pc-avatar" style="background:linear-gradient(135deg,rgba(0,255,135,0.2),rgba(0,255,135,0.05));">SG</div>
+            <div class="pc-online-ring" style="border-color:var(--green);"></div>
+          </div>
+          <div class="pc-body">
+            <div class="pc-name">ShadowGrid</div>
+            <div class="pc-rank" style="color:#cd7f32;">&#x25C8; Gold</div>
+            <div class="pc-game">PUBG</div>
+            <div class="pc-tags">
+              <span class="pc-tag" style="color:var(--green);">EN</span>
+              <span class="pc-tag" style="color:var(--cyan);">18+</span>
+            </div>
+          </div>
+          <button class="pc-invite-btn" style="border-color:rgba(0,255,135,0.4); color:var(--green);" onclick="openMatchFromCard('ShadowGrid','PUBG')">Davet Et</button>
+        </div>
+
+        <div class="player-card" data-game="LoL">
+          <div class="pc-header">
+            <div class="pc-avatar" style="background:linear-gradient(135deg,rgba(180,0,255,0.2),rgba(180,0,255,0.05));">CY</div>
+            <div class="pc-online-ring" style="border-color:var(--purple);"></div>
+          </div>
+          <div class="pc-body">
+            <div class="pc-name">CyberYuki</div>
+            <div class="pc-rank" style="color:var(--yellow);">&#x2605; Challenger</div>
+            <div class="pc-game">League of Legends</div>
+            <div class="pc-tags">
+              <span class="pc-tag" style="color:var(--cyan);">TR</span>
+              <span class="pc-tag" style="color:var(--purple);">Mikrofon</span>
+            </div>
+          </div>
+          <button class="pc-invite-btn" style="border-color:rgba(180,0,255,0.4); color:var(--purple);" onclick="openMatchFromCard('CyberYuki','LoL')">Davet Et</button>
+        </div>
+
+        <div class="player-card" data-game="Apex">
+          <div class="pc-header">
+            <div class="pc-avatar" style="background:linear-gradient(135deg,rgba(255,224,0,0.2),rgba(255,224,0,0.05));">RZ</div>
+            <div class="pc-online-ring" style="border-color:var(--yellow);"></div>
+          </div>
+          <div class="pc-body">
+            <div class="pc-name">R4Z0R_TR</div>
+            <div class="pc-rank" style="color:var(--yellow);">&#x2605; Master</div>
+            <div class="pc-game">Apex Legends</div>
+            <div class="pc-tags">
+              <span class="pc-tag" style="color:var(--cyan);">TR</span>
+              <span class="pc-tag" style="color:var(--yellow);">21+</span>
+            </div>
+          </div>
+          <button class="pc-invite-btn" style="border-color:rgba(255,224,0,0.4); color:var(--yellow);" onclick="openMatchFromCard('R4Z0R_TR','Apex')">Davet Et</button>
+        </div>
+
+        <div class="player-card" data-game="Fortnite">
+          <div class="pc-header">
+            <div class="pc-avatar" style="background:linear-gradient(135deg,rgba(0,245,255,0.15),rgba(180,0,255,0.15));">GX</div>
+            <div class="pc-online-ring"></div>
+          </div>
+          <div class="pc-body">
+            <div class="pc-name">GhostX</div>
+            <div class="pc-rank" style="color:#c0c0c0;">&#x25C6; Silver</div>
+            <div class="pc-game">Fortnite</div>
+            <div class="pc-tags">
+              <span class="pc-tag" style="color:var(--cyan);">TR</span>
+              <span class="pc-tag" style="color:var(--green);">14+</span>
+            </div>
+          </div>
+          <button class="pc-invite-btn" onclick="openMatchFromCard('GhostX','Fortnite')">Davet Et</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: Stats + Leaderboard -->
+    <div class="module-side">
+
+      <!-- Mini stats -->
+      <div class="side-widget">
+        <div class="widget-title">Anlik Istatistikler</div>
+        <div class="mini-stats-grid">
+          <div class="mini-stat">
+            <div class="mini-stat-val" style="color:var(--cyan);">2.347</div>
+            <div class="mini-stat-label">Cevrimici</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val" style="color:var(--green);">847</div>
+            <div class="mini-stat-label">Hazir Squad</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val" style="color:var(--purple);">128</div>
+            <div class="mini-stat-label">Aktif Oyun</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val" style="color:var(--yellow);">12sn</div>
+            <div class="mini-stat-label">Ort. Eslestirme</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="side-widget">
+        <div class="widget-title">En Cok Eslesen</div>
+        <div class="leaderboard-list">
+          <div class="lb-item">
+            <div class="lb-rank gold">#1</div>
+            <div class="lb-name">NeonX_Pro</div>
+            <div class="lb-score">342 eslesme</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rank silver">#2</div>
+            <div class="lb-name">CyberYuki</div>
+            <div class="lb-score">298 eslesme</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rank bronze">#3</div>
+            <div class="lb-name">R4Z0R_TR</div>
+            <div class="lb-score">261 eslesme</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rank">#4</div>
+            <div class="lb-name">GhostByte</div>
+            <div class="lb-score">203 eslesme</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rank">#5</div>
+            <div class="lb-name">StormBreaker</div>
+            <div class="lb-score">187 eslesme</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="side-cta-card">
+        <div class="side-cta-glow"></div>
+        <div style="font-family:'Orbitron',sans-serif; font-size:13px; font-weight:700; letter-spacing:1px; margin-bottom:8px;">TAKIM ARIYORUM</div>
+        <p style="font-size:13px; color:var(--text-dim); margin-bottom:16px; line-height:1.5;">Tercihlerini belirle, sana en uygun takimi saniyeler icinde bulalim.</p>
+        <button class="cta-main" style="width:100%; justify-content:center; font-size:11px;" id="sideCTAMatch">&#x26A1; Simdi Esles</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════ FOOTER ═══════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-bg-text">SQUADX</div>
+
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo">
+        <div class="logo-icon">⬡</div>
+        SQUAD<span>X</span>
+      </a>
+      <p class="footer-tagline">Türkiye'nin en büyük oyuncu topluluğunda takım arkadaşını bul, sıra dışı deneyimler yaşa, efsane ol.</p>
+      <div class="social-links">
+        <a href="#" class="social-link ig" title="Instagram">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+        </a>
+        <a href="#" class="social-link yt" title="YouTube">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="#" class="social-link x-tw" title="X (Twitter)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="#" class="social-link fb" title="Facebook">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="#" class="social-link tw" title="Twitch">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2H3v16h5v4l4-4h5l4-4V2z"/><line x1="11" y1="7" x2="11" y2="11"/><line x1="16" y1="7" x2="16" y2="11"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <div class="footer-col-title">Platform</div>
+      <ul class="footer-links">
+        <li><a href="#">Squad Bul</a></li>
+        <li><a href="#">Turnuvalar</a></li>
+        <li><a href="#">Klan Sistemi</a></li>
+        <li><a href="#">Liderlik Tablosu</a></li>
+        <li><a href="#">Anlık Bildirimler</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <div class="footer-col-title">Oyunlar</div>
+      <ul class="footer-links">
+        <li><a href="#">Valorant</a></li>
+        <li><a href="#">CS2</a></li>
+        <li><a href="#">League of Legends</a></li>
+        <li><a href="#">PUBG</a></li>
+        <li><a href="#">Tüm Oyunlar →</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <div class="footer-col-title">Destek</div>
+      <ul class="footer-links">
+        <li><a href="#">Yardım Merkezi</a></li>
+        <li><a href="#">Topluluk Kuralları</a></li>
+        <li><a href="#">Güvenli Oyun</a></li>
+        <li><a href="#">İletişim</a></li>
+        <li><a href="#">Blog</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 SQUADX. TÜM HAKLAR SAKLIDIR.</div>
+    <div class="footer-legal">
+      <a href="#">Gizlilik Politikası</a>
+      <a href="#">Kullanım Koşulları</a>
+      <a href="#">Çerez Politikası</a>
+    </div>
+    <div class="footer-status">
+      <div class="nav-ping"></div>
+      TÜM SİSTEMLER AKTİF
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════ FILTER PANEL ═══════════════════════════════════ -->
+<div class="filter-panel-overlay" id="filterOverlay"></div>
+<div class="filter-panel" id="filterPanel">
+  <div class="fp-header">
+    <div class="fp-title">&#x25BC; FILTRELEME SECENEKLERI</div>
+    <button class="fp-close" id="closeFilter">&#x2715;</button>
+  </div>
+  <div class="fp-body">
+
+    <div class="fp-group">
+      <div class="fp-group-label">Oyun Adi</div>
+      <div class="fp-chips" id="fpGames">
+        <button class="fp-chip" data-filter="game" data-val="Valorant">Valorant</button>
+        <button class="fp-chip" data-filter="game" data-val="CS2">CS2</button>
+        <button class="fp-chip" data-filter="game" data-val="PUBG">PUBG</button>
+        <button class="fp-chip" data-filter="game" data-val="League of Legends">LoL</button>
+        <button class="fp-chip" data-filter="game" data-val="Apex Legends">Apex</button>
+        <button class="fp-chip" data-filter="game" data-val="Fortnite">Fortnite</button>
+        <button class="fp-chip" data-filter="game" data-val="Overwatch 2">OW2</button>
+        <button class="fp-chip" data-filter="game" data-val="Dota 2">Dota 2</button>
+        <button class="fp-chip" data-filter="game" data-val="Minecraft">Minecraft</button>
+        <button class="fp-chip" data-filter="game" data-val="GTA Online">GTA V</button>
+      </div>
+    </div>
+
+    <div class="fp-group">
+      <div class="fp-group-label">Oyun Turu</div>
+      <div class="fp-chips">
+        <button class="fp-chip" data-filter="genre" data-val="FPS">FPS</button>
+        <button class="fp-chip" data-filter="genre" data-val="BR">Battle Royale</button>
+        <button class="fp-chip" data-filter="genre" data-val="MOBA">MOBA</button>
+        <button class="fp-chip" data-filter="genre" data-val="RPG">RPG</button>
+        <button class="fp-chip" data-filter="genre" data-val="Strateji">Strateji</button>
+        <button class="fp-chip" data-filter="genre" data-val="Spor">Spor</button>
+        <button class="fp-chip" data-filter="genre" data-val="Sandbox">Sandbox</button>
+      </div>
+    </div>
+
+    <div class="fp-group">
+      <div class="fp-group-label">Yas Arali&#x11F;i</div>
+      <div class="fp-range-wrap">
+        <div class="fp-range-val" id="ageRangeLabel">14 — 35</div>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <span style="font-size:11px; color:var(--text-dim); width:20px;">14</span>
+          <input type="range" class="fp-slider" id="ageMin" min="14" max="40" value="14" style="--pct:0%"/>
+          <span style="font-size:11px; color:var(--text-dim); width:20px;">40+</span>
+        </div>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <span style="font-size:11px; color:var(--text-dim); width:20px;">14</span>
+          <input type="range" class="fp-slider" id="ageMax" min="14" max="40" value="35" style="--pct:100%"/>
+          <span style="font-size:11px; color:var(--text-dim); width:20px;">40+</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fp-group">
+      <div class="fp-group-label">Oyuncu Dili</div>
+      <div class="fp-chips">
+        <button class="fp-chip" data-filter="lang" data-val="Turkce">&#x1F1F9;&#x1F1F7; Turkce</button>
+        <button class="fp-chip" data-filter="lang" data-val="English">&#x1F1EC;&#x1F1E7; English</button>
+        <button class="fp-chip" data-filter="lang" data-val="Deutsch">&#x1F1E9;&#x1F1EA; Deutsch</button>
+        <button class="fp-chip" data-filter="lang" data-val="Espanol">&#x1F1EA;&#x1F1F8; Espanol</button>
+        <button class="fp-chip" data-filter="lang" data-val="Francais">&#x1F1EB;&#x1F1F7; Francais</button>
+        <button class="fp-chip" data-filter="lang" data-val="Russca">&#x1F1F7;&#x1F1FA; Russca</button>
+      </div>
+    </div>
+
+    <div class="fp-group">
+      <div class="fp-group-label">Oyun Stili</div>
+      <div class="fp-chips">
+        <button class="fp-chip" data-filter="style" data-val="Rekabetci">Rekabetci</button>
+        <button class="fp-chip" data-filter="style" data-val="Eglenceli">Eglenceli</button>
+        <button class="fp-chip" data-filter="style" data-val="Stratejik">Stratejik</button>
+        <button class="fp-chip" data-filter="style" data-val="Agresif">Agresif</button>
+        <button class="fp-chip" data-filter="style" data-val="Rahat">Rahat</button>
+      </div>
+    </div>
+
+    <div class="fp-group">
+      <div class="fp-group-label">Ekip Boyutu</div>
+      <div class="fp-chips">
+        <button class="fp-chip" data-filter="size" data-val="Solo">Solo (1)</button>
+        <button class="fp-chip" data-filter="size" data-val="Duo">Duo (2)</button>
+        <button class="fp-chip" data-filter="size" data-val="Trio">Trio (3)</button>
+        <button class="fp-chip" data-filter="size" data-val="Squad">Squad (4+)</button>
+      </div>
+    </div>
+
+    <div class="fp-group">
+      <div class="fp-group-label">Mikrofon</div>
+      <div class="fp-chips">
+        <button class="fp-chip" data-filter="mic" data-val="Zorunlu">Zorunlu</button>
+        <button class="fp-chip" data-filter="mic" data-val="Tercih">Tercih Edilir</button>
+        <button class="fp-chip" data-filter="mic" data-val="Farketmez">Farketmez</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="fp-footer">
+    <button class="fp-clear-btn" id="clearFilters">Temizle</button>
+    <button class="fp-apply-btn" id="applyFilters">Filtreleri Uygula</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ MATCH MODAL ═══════════════════════════════════ -->
+<div class="match-overlay" id="matchOverlay">
+  <div class="match-modal" id="matchModal">
+    <div class="mm-header">
+      <div class="mm-header-left">
+        <div class="mm-pretitle">Akilli Eslestirme Sistemi</div>
+        <div class="mm-title">TAKIM ARA</div>
+      </div>
+      <button class="mm-close" id="closeMatch">&#x2715;</button>
+    </div>
+
+    <div class="mm-steps">
+      <div class="mm-step active" data-step="1">
+        <div class="mm-step-num">1</div>
+        <div class="mm-step-label">Oyun</div>
+      </div>
+      <div class="mm-step" data-step="2">
+        <div class="mm-step-num">2</div>
+        <div class="mm-step-label">Tercihler</div>
+      </div>
+      <div class="mm-step" data-step="3">
+        <div class="mm-step-num">3</div>
+        <div class="mm-step-label">Profil</div>
+      </div>
+    </div>
+
+    <!-- STEP 1: Game -->
+    <div class="mm-body">
+      <div class="mm-step-content active" id="mmStep1">
+        <div class="mm-section">
+          <div class="mm-section-title">Hangi oyunu oynuyorsun?</div>
+          <div class="mm-chips">
+            <button class="mm-chip" data-mm="game" data-val="Valorant">&#x1F3AE; Valorant</button>
+            <button class="mm-chip" data-mm="game" data-val="CS2">&#x1F52B; CS2</button>
+            <button class="mm-chip" data-mm="game" data-val="PUBG">&#x1F4A5; PUBG</button>
+            <button class="mm-chip" data-mm="game" data-val="LoL">&#x2694; League of Legends</button>
+            <button class="mm-chip" data-mm="game" data-val="Apex">&#x1F680; Apex Legends</button>
+            <button class="mm-chip" data-mm="game" data-val="Fortnite">&#x1F4AB; Fortnite</button>
+            <button class="mm-chip" data-mm="game" data-val="Overwatch">&#x1F6E1; Overwatch 2</button>
+            <button class="mm-chip" data-mm="game" data-val="Dota2">&#x1F9D9; Dota 2</button>
+          </div>
+        </div>
+        <div class="mm-section">
+          <div class="mm-section-title">Rankın nedir?</div>
+          <div class="mm-chips">
+            <button class="mm-chip" data-mm="rank" data-val="Yeni Basliyor">Yeni Basliyor</button>
+            <button class="mm-chip" data-mm="rank" data-val="Bronze">Bronze</button>
+            <button class="mm-chip" data-mm="rank" data-val="Silver">Silver</button>
+            <button class="mm-chip" data-mm="rank" data-val="Gold">Gold</button>
+            <button class="mm-chip" data-mm="rank" data-val="Platinum">Platinum</button>
+            <button class="mm-chip" data-mm="rank" data-val="Diamond">Diamond</button>
+            <button class="mm-chip" data-mm="rank" data-val="Master+">Master+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Preferences -->
+      <div class="mm-step-content" id="mmStep2">
+        <div class="mm-section">
+          <div class="mm-section-title">Ekip boyutu</div>
+          <div class="mm-chips">
+            <button class="mm-chip" data-mm="size" data-val="Duo">Duo (2 kisi)</button>
+            <button class="mm-chip" data-mm="size" data-val="Trio">Trio (3 kisi)</button>
+            <button class="mm-chip" data-mm="size" data-val="Squad">Tam Squad (4+)</button>
+          </div>
+        </div>
+        <div class="mm-section">
+          <div class="mm-section-title">Oyun stili</div>
+          <div class="mm-chips">
+            <button class="mm-chip" data-mm="style" data-val="Rekabetci">&#x1F3C6; Rekabetci</button>
+            <button class="mm-chip" data-mm="style" data-val="Rahat">&#x1F604; Rahat</button>
+            <button class="mm-chip" data-mm="style" data-val="Stratejik">&#x1F9E0; Stratejik</button>
+            <button class="mm-chip" data-mm="style" data-val="Agresif">&#x1F525; Agresif</button>
+          </div>
+        </div>
+        <div class="mm-section">
+          <div class="mm-section-title">Dil</div>
+          <div class="mm-chips">
+            <button class="mm-chip" data-mm="lang" data-val="TR">&#x1F1F9;&#x1F1F7; Turkce</button>
+            <button class="mm-chip" data-mm="lang" data-val="EN">&#x1F1EC;&#x1F1E7; English</button>
+            <button class="mm-chip" data-mm="lang" data-val="Fark etmez">Fark etmez</button>
+          </div>
+        </div>
+        <div class="mm-section">
+          <div class="mm-section-title">Mikrofon</div>
+          <div class="mm-chips">
+            <button class="mm-chip" data-mm="mic" data-val="Zorunlu">&#x1F3A4; Zorunlu</button>
+            <button class="mm-chip" data-mm="mic" data-val="Tercih">Tercih Edilir</button>
+            <button class="mm-chip" data-mm="mic" data-val="Farketmez">Farketmez</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Profile -->
+      <div class="mm-step-content" id="mmStep3">
+        <div class="mm-section">
+          <div class="mm-section-title">Oyuncu adin</div>
+          <div style="position:relative;">
+            <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);opacity:0.4;font-size:15px;">&#x1F464;</span>
+            <input type="text" class="form-input with-icon" id="mmUsername" placeholder="Oyuncu adinizi girin..." style="margin:0;"/>
+          </div>
+        </div>
+        <div class="mm-section">
+          <div class="mm-section-title">Oyun saatle rin</div>
+          <div class="mm-chips">
+            <button class="mm-chip" data-mm="time" data-val="Sabah">&#x1F305; Sabah (06-12)</button>
+            <button class="mm-chip" data-mm="time" data-val="Ogle">&#x1F31E; Ogle (12-18)</button>
+            <button class="mm-chip" data-mm="time" data-val="Aksam">&#x1F307; Aksam (18-24)</button>
+            <button class="mm-chip" data-mm="time" data-val="Gece">&#x1F319; Gece (00-06)</button>
+          </div>
+        </div>
+        <div class="mm-section">
+          <div class="mm-section-title">Yas araligı</div>
+          <div class="mm-chips">
+            <button class="mm-chip" data-mm="age" data-val="14-17">14–17</button>
+            <button class="mm-chip" data-mm="age" data-val="18-21">18–21</button>
+            <button class="mm-chip" data-mm="age" data-val="22-27">22–27</button>
+            <button class="mm-chip" data-mm="age" data-val="28+">28+</button>
+            <button class="mm-chip" data-mm="age" data-val="Fark etmez">Fark etmez</button>
+          </div>
+        </div>
+
+        <!-- Searching state -->
+        <div class="mm-searching" id="mmSearching">
+          <div class="search-radar">
+            <div class="radar-ring"></div>
+            <div class="radar-ring"></div>
+            <div class="radar-ring"></div>
+            <div class="radar-ring"></div>
+            <div class="radar-center"></div>
+          </div>
+          <div class="searching-text">TAKIM ARANIYOR...</div>
+          <div class="searching-timer" id="searchTimer">0</div>
+          <div class="searching-sub">Kriterlerinize uyan oyuncular taranıyor</div>
+        </div>
+
+        <!-- Found state -->
+        <div class="mm-found" id="mmFound">
+          <div class="found-icon">&#x1F91D;</div>
+          <div class="found-title">TAKIM BULUNDU!</div>
+          <div class="found-players">
+            <div class="found-player">
+              <div class="fp-av" style="background:rgba(0,245,255,0.15); color:var(--cyan);">NX</div>
+              <div class="fp-nm">NeonX</div>
+              <div class="fp-rk">Diamond</div>
+            </div>
+            <div class="found-player">
+              <div class="fp-av" style="background:rgba(180,0,255,0.15); color:var(--purple);">SG</div>
+              <div class="fp-nm">ShadowG</div>
+              <div class="fp-rk">Platinum</div>
+            </div>
+            <div class="found-player">
+              <div class="fp-av" style="background:rgba(0,255,135,0.12); color:var(--green);">CY</div>
+              <div class="fp-nm">CyberY</div>
+              <div class="fp-rk">Gold</div>
+            </div>
+          </div>
+          <button class="cta-main" style="font-size:11px;">&#x1F3AE; Lobiye Katil</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mm-footer" id="mmFooter">
+      <button class="mm-back-btn" id="mmBack" style="display:none;">&#x2190; Geri</button>
+      <button class="mm-next-btn" id="mmNext">Devam Et &#x2192;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ AUTH MODALS ═══════════════════════════════════ -->
+
+<!-- REGISTER MODAL -->
+<div class="auth-overlay" id="registerOverlay">
+  <div class="auth-modal" id="registerModal">
+    <button class="auth-close" id="closeRegister">&#x2715;</button>
+
+    <div class="auth-left">
+      <div class="auth-brand">
+        <div class="logo-icon">&#x2B21;</div>
+        SQUAD<span>X</span>
+      </div>
+      <div class="auth-left-content">
+        <div class="auth-left-tag"><span class="dot"></span> 52.400+ Aktif Oyuncu</div>
+        <h2 class="auth-left-title">EFSANELER<br/><span class="accent-cyan">BURADAN</span><br/>BASLAR</h2>
+        <p class="auth-left-desc">Saniyeler icinde takım bul, turnuvalara katil, sıradışı deneyimler yaşa.</p>
+        <div class="auth-perks">
+          <div class="auth-perk"><span class="perk-icon icon-cyan">&#x26A1;</span><span>Aninda eslestirme — ort. 12 sn</span></div>
+          <div class="auth-perk"><span class="perk-icon icon-green">&#x1F3C6;</span><span>Haftalik turnuvalar &amp; oduller</span></div>
+          <div class="auth-perk"><span class="perk-icon icon-purple">&#x1F6E1;</span><span>Anti-troll dogrulanmis sistem</span></div>
+        </div>
+      </div>
+      <div class="auth-left-deco">
+        <div class="deco-ring ring1"></div>
+        <div class="deco-ring ring2"></div>
+        <div class="deco-ring ring3"></div>
+        <div class="deco-num">01</div>
+      </div>
+    </div>
+
+    <div class="auth-right">
+      <div class="auth-form-header">
+        <h3 class="auth-form-title">Hesap Olustur</h3>
+        <p class="auth-form-sub">Ucretsiz katil, hemen oynamaya basla</p>
+      </div>
+
+      <div class="social-auth-grid">
+        <button class="social-auth-btn google">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Google ile Kaydol
+        </button>
+        <button class="social-auth-btn facebook">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </button>
+        <button class="social-auth-btn twitch">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#9146FF"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+          Twitch
+        </button>
+      </div>
+
+      <div class="auth-divider"><span>veya e-posta ile kaydol</span></div>
+
+      <form class="auth-form" onsubmit="return false;">
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label class="form-label">Ad</label>
+            <input type="text" class="form-input" placeholder="Adın"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Soyad</label>
+            <input type="text" class="form-input" placeholder="Soyadın"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Oyuncu Adı (Tag)</label>
+          <div class="input-icon-wrap">
+            <span class="input-icon">&#x1F3AE;</span>
+            <input type="text" class="form-input with-icon" placeholder="NeonX_Pro"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">E-posta</label>
+          <div class="input-icon-wrap">
+            <span class="input-icon">&#x2709;</span>
+            <input type="email" class="form-input with-icon" placeholder="oyuncu@mail.com"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sifre</label>
+          <div class="input-icon-wrap">
+            <span class="input-icon">&#x1F512;</span>
+            <input type="password" class="form-input with-icon" id="regPass" placeholder="En az 8 karakter"/>
+            <button type="button" class="input-toggle" onclick="togglePass('regPass', this)">&#x1F441;</button>
+          </div>
+          <div class="password-strength" id="strengthBar">
+            <div class="strength-fill" id="strengthFill"></div>
+          </div>
+          <div class="strength-label" id="strengthLabel"></div>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="terms" class="check-input"/>
+          <label for="terms" class="check-label">Kullanım koşullarını ve gizlilik politikasını kabul ediyorum</label>
+        </div>
+        <button type="submit" class="auth-submit-btn">
+          <span>&#x26A1;</span> Hesap Olustur
+        </button>
+      </form>
+
+      <div class="auth-switch">
+        Zaten hesabın var mı? <button class="auth-switch-btn" id="switchToLogin">Giris Yap</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="auth-overlay" id="loginOverlay">
+  <div class="auth-modal" id="loginModal">
+    <button class="auth-close" id="closeLogin">&#x2715;</button>
+
+    <div class="auth-left login-left">
+      <div class="auth-brand">
+        <div class="logo-icon">&#x2B21;</div>
+        SQUAD<span>X</span>
+      </div>
+      <div class="auth-left-content">
+        <div class="auth-left-tag" style="color:var(--purple); background:var(--purple-dim); border-color:rgba(180,0,255,0.3)"><span class="dot" style="background:var(--purple); box-shadow:0 0 6px var(--purple)"></span> Hosgeldin Geri</div>
+        <h2 class="auth-left-title">TEKRAR<br/><span style="color:var(--purple); text-shadow:0 0 40px var(--purple)">SAHAYA</span><br/>GIR</h2>
+        <p class="auth-left-desc">Takımın seni bekliyor. Hemen giris yap ve oyuna dal.</p>
+        <div class="auth-perks">
+          <div class="auth-perk"><span class="perk-icon icon-cyan">&#x1F504;</span><span>Son aktif kadronuna devam et</span></div>
+          <div class="auth-perk"><span class="perk-icon icon-yellow">&#x1F514;</span><span>Kaçirdığın bildirimleri gor</span></div>
+          <div class="auth-perk"><span class="perk-icon icon-pink">&#x1F525;</span><span>Streak'ini koru, XP kazan</span></div>
+        </div>
+      </div>
+      <div class="auth-left-deco">
+        <div class="deco-ring ring1" style="border-color:rgba(180,0,255,0.2)"></div>
+        <div class="deco-ring ring2" style="border-color:rgba(180,0,255,0.1)"></div>
+        <div class="deco-ring ring3" style="border-color:rgba(180,0,255,0.05)"></div>
+        <div class="deco-num" style="-webkit-text-stroke-color:rgba(180,0,255,0.15)">02</div>
+      </div>
+    </div>
+
+    <div class="auth-right">
+      <div class="auth-form-header">
+        <h3 class="auth-form-title">Giris Yap</h3>
+        <p class="auth-form-sub">Hesabına erişmek için giris yap</p>
+      </div>
+
+      <div class="social-auth-grid">
+        <button class="social-auth-btn google">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Google ile Giris
+        </button>
+        <button class="social-auth-btn facebook">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </button>
+        <button class="social-auth-btn twitch">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#9146FF"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+          Twitch
+        </button>
+      </div>
+
+      <div class="auth-divider"><span>veya e-posta ile giris yap</span></div>
+
+      <form class="auth-form" onsubmit="return false;">
+        <div class="form-group">
+          <label class="form-label">E-posta veya Oyuncu Adı</label>
+          <div class="input-icon-wrap">
+            <span class="input-icon">&#x1F464;</span>
+            <input type="text" class="form-input with-icon" placeholder="oyuncu@mail.com"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+            Sifre
+            <button type="button" class="forgot-btn">Sifremi unuttum</button>
+          </label>
+          <div class="input-icon-wrap">
+            <span class="input-icon">&#x1F512;</span>
+            <input type="password" class="form-input with-icon" id="loginPass" placeholder="Sifreniz"/>
+            <button type="button" class="input-toggle" onclick="togglePass('loginPass', this)">&#x1F441;</button>
+          </div>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="remember" class="check-input"/>
+          <label for="remember" class="check-label">Beni hatırla</label>
+        </div>
+        <button type="submit" class="auth-submit-btn login-submit">
+          <span>&#x1F3AE;</span> Giris Yap
+        </button>
+      </form>
+
+      <div class="auth-switch">
+        Hesabın yok mu? <button class="auth-switch-btn" id="switchToRegister">Kaydol</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ══════════════════════════════════════
+   AUTH MODAL STYLES
+══════════════════════════════════════ */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(4,6,16,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.auth-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.auth-modal {
+  width: 100%;
+  max-width: 900px;
+  max-height: 95vh;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 60px rgba(0,245,255,0.06);
+  transform: translateY(24px) scale(0.97);
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.auth-overlay.open .auth-modal {
+  transform: translateY(0) scale(1);
+}
+
+/* Close button */
+.auth-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  z-index: 10;
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.auth-close:hover { background: rgba(255,59,59,0.15); border-color: rgba(255,59,59,0.4); color: var(--red); }
+
+/* LEFT PANEL */
+.auth-left {
+  background: linear-gradient(135deg, #0a001a 0%, #040610 60%, #001a20 100%);
+  padding: 48px 40px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.login-left {
+  background: linear-gradient(135deg, #0a0010 0%, #040610 60%, #100020 100%);
+}
+
+.auth-brand {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: var(--text-bright);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 48px;
+}
+.auth-brand span { color: var(--cyan); text-shadow: var(--glow-cyan); }
+
+.auth-left-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--cyan-dim);
+  border: 1px solid rgba(0,245,255,0.3);
+  color: var(--cyan);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 2px;
+  margin-bottom: 20px;
+}
+
+.auth-left-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(26px, 3.5vw, 38px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -1px;
+  margin-bottom: 16px;
+}
+
+.auth-left-desc {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 32px;
+  max-width: 280px;
+}
+
+.auth-perks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.auth-perk {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-mid);
+  font-weight: 500;
+}
+.perk-icon {
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.icon-yellow { background: rgba(255,224,0,0.15); box-shadow: 0 0 10px rgba(255,224,0,0.25); }
+.icon-pink { background: rgba(255,0,144,0.15); box-shadow: 0 0 10px rgba(255,0,144,0.25); }
+
+/* Deco rings */
+.auth-left-deco {
+  position: absolute;
+  right: -80px; bottom: -80px;
+  pointer-events: none;
+}
+.deco-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid;
+  animation: hex-rotate 20s linear infinite;
+}
+.ring1 { width: 280px; height: 280px; border-color: rgba(0,245,255,0.2); right: 0; bottom: 0; }
+.ring2 { width: 180px; height: 180px; border-color: rgba(0,245,255,0.1); right: 50px; bottom: 50px; animation-duration: 15s; animation-direction: reverse; }
+.ring3 { width: 100px; height: 100px; border-color: rgba(0,245,255,0.08); right: 90px; bottom: 90px; animation-duration: 10s; }
+.deco-num {
+  position: absolute;
+  right: 60px; bottom: 40px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 80px;
+  font-weight: 900;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(0,245,255,0.12);
+  user-select: none;
+  line-height: 1;
+}
+
+/* RIGHT PANEL */
+.auth-right {
+  padding: 40px 44px;
+  overflow-y: auto;
+  background: var(--bg-deep);
+  scrollbar-width: thin;
+}
+
+.auth-form-header { margin-bottom: 28px; }
+.auth-form-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.auth-form-sub { font-size: 13px; color: var(--text-dim); letter-spacing: 0.5px; }
+
+/* Social auth */
+.social-auth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.social-auth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--text-mid);
+  padding: 10px 10px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.social-auth-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: var(--text-bright); transform: translateY(-1px); }
+.social-auth-btn.google:hover { border-color: rgba(66,133,244,0.5); box-shadow: 0 0 15px rgba(66,133,244,0.2); }
+.social-auth-btn.facebook:hover { border-color: rgba(24,119,242,0.5); box-shadow: 0 0 15px rgba(24,119,242,0.2); }
+.social-auth-btn.twitch:hover { border-color: rgba(145,70,255,0.5); box-shadow: 0 0 15px rgba(145,70,255,0.2); }
+
+/* Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.auth-divider::before, .auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Form */
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+.form-row.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 7px; }
+.form-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.input-icon-wrap {
+  position: relative;
+}
+.input-icon {
+  position: absolute;
+  left: 14px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+.form-input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-bright);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 12px 14px;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  letter-spacing: 0.3px;
+}
+.form-input.with-icon { padding-left: 42px; padding-right: 42px; }
+.form-input::placeholder { color: rgba(255,255,255,0.2); }
+.form-input:focus {
+  border-color: var(--cyan);
+  background: rgba(0,245,255,0.04);
+  box-shadow: 0 0 0 1px rgba(0,245,255,0.3);
+}
+
+.input-toggle {
+  position: absolute;
+  right: 12px; top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 15px;
+  padding: 2px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+.input-toggle:hover { opacity: 1; }
+
+/* Password strength */
+.password-strength {
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.strength-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  transition: width 0.3s, background 0.3s;
+}
+.strength-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Checkbox */
+.form-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.check-input {
+  width: 16px; height: 16px;
+  accent-color: var(--cyan);
+  flex-shrink: 0;
+  margin-top: 2px;
+  cursor: pointer;
+}
+.check-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+/* Forgot */
+.forgot-btn {
+  background: none;
+  border: none;
+  color: var(--cyan);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  text-transform: uppercase;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.forgot-btn:hover { opacity: 1; }
+
+/* Submit */
+.auth-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  background: linear-gradient(135deg, var(--cyan) 0%, #0099cc 100%);
+  border: none;
+  color: var(--bg-deep);
+  padding: 14px 24px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 6px;
+  box-shadow: 0 0 25px rgba(0,245,255,0.35);
+  transition: all 0.25s;
+  margin-top: 4px;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+.auth-submit-btn:hover { box-shadow: 0 0 45px rgba(0,245,255,0.6); transform: translateY(-2px); }
+.login-submit {
+  background: linear-gradient(135deg, var(--purple) 0%, #7700aa 100%);
+  box-shadow: 0 0 25px rgba(180,0,255,0.35);
+}
+.login-submit:hover { box-shadow: 0 0 45px rgba(180,0,255,0.6); }
+
+/* Switch */
+.auth-switch {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.auth-switch-btn {
+  background: none;
+  border: none;
+  color: var(--cyan);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity 0.2s;
+}
+.auth-switch-btn:hover { opacity: 0.8; }
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  .auth-modal { grid-template-columns: 1fr; max-height: 92vh; }
+  .auth-left { display: none; }
+  .auth-right { padding: 32px 24px; }
+  .social-auth-grid { grid-template-columns: 1fr; }
+  .social-auth-btn { justify-content: flex-start; }
+  .form-row.two-col { grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+  // ─── SLIDER ───
+  const slidesEl = document.getElementById('slides');
+  const dots = document.querySelectorAll('.slider-dots .dot');
+  const progressBar = document.getElementById('sliderProgress');
+  let current = 0;
+  let autoTimer;
+
+  function goTo(idx) {
+    current = (idx + 3) % 3;
+    slidesEl.style.transform = `translateX(-${current * 100}%)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    // Reset progress
+    progressBar.style.animation = 'none';
+    void progressBar.offsetWidth;
+    progressBar.style.animation = 'progress-bar 5s linear infinite';
+  }
+
+  document.getElementById('prevBtn').addEventListener('click', () => { goTo(current - 1); resetAuto(); });
+  document.getElementById('nextBtn').addEventListener('click', () => { goTo(current + 1); resetAuto(); });
+
+  dots.forEach(d => {
+    d.addEventListener('click', () => { goTo(+d.dataset.index); resetAuto(); });
+  });
+
+  function resetAuto() {
+    clearInterval(autoTimer);
+    autoTimer = setInterval(() => goTo(current + 1), 5000);
+  }
+
+  autoTimer = setInterval(() => goTo(current + 1), 5000);
+
+  // Touch support
+  let touchStart = 0;
+  slidesEl.addEventListener('touchstart', e => touchStart = e.touches[0].clientX);
+  slidesEl.addEventListener('touchend', e => {
+    const diff = touchStart - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) { goTo(diff > 0 ? current + 1 : current - 1); resetAuto(); }
+  });
+
+  // ─── COUNTER ANIMATION ───
+  function animateCounter(el, target, suffix = '') {
+    let start = 0;
+    const step = target / 80;
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) { el.textContent = target.toLocaleString('tr-TR') + suffix; clearInterval(timer); return; }
+      el.textContent = Math.floor(start).toLocaleString('tr-TR') + suffix;
+    }, 18);
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) {
+      animateCounter(document.getElementById('counter1'), 52400, '+');
+      animateCounter(document.getElementById('counter2'), 18700, '+');
+      animateCounter(document.getElementById('counter3'), 128, '+');
+      observer.disconnect();
+    }
+  }, { threshold: 0.3 });
+
+  observer.observe(document.querySelector('.hero-headline-bar'));
+
+  // ─── FILTER PANEL ───
+  const filterPanel = document.getElementById('filterPanel');
+  const filterOverlay = document.getElementById('filterOverlay');
+  const filterActiveDot = document.getElementById('filterActiveDot');
+  const activeFiltersBar = document.getElementById('activeFiltersBar');
+  let activeFilters = {};
+
+  function openFilter() {
+    filterPanel.classList.add('open');
+    filterOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeFilter() {
+    filterPanel.classList.remove('open');
+    filterOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('openFilterPanel').addEventListener('click', openFilter);
+  document.getElementById('closeFilter').addEventListener('click', closeFilter);
+  filterOverlay.addEventListener('click', closeFilter);
+
+  // Chip toggle
+  document.querySelectorAll('.fp-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      const filter = this.dataset.filter;
+      const val = this.dataset.val;
+      if (!activeFilters[filter]) activeFilters[filter] = new Set();
+      if (activeFilters[filter].has(val)) {
+        activeFilters[filter].delete(val);
+        this.classList.remove('selected');
+      } else {
+        activeFilters[filter].add(val);
+        this.classList.add('selected');
+      }
+    });
+  });
+
+  // Age range
+  const ageMin = document.getElementById('ageMin');
+  const ageMax = document.getElementById('ageMax');
+  const ageLabel = document.getElementById('ageRangeLabel');
+  function updateAgeSlider(el) {
+    const pct = ((el.value - 14) / (40 - 14)) * 100;
+    el.style.setProperty('--pct', pct + '%');
+    ageLabel.textContent = `${ageMin.value} — ${parseInt(ageMax.value) === 40 ? '40+' : ageMax.value}`;
+  }
+  ageMin.addEventListener('input', () => updateAgeSlider(ageMin));
+  ageMax.addEventListener('input', () => updateAgeSlider(ageMax));
+
+  // Apply
+  document.getElementById('applyFilters').addEventListener('click', () => {
+    renderActiveFilters();
+    closeFilter();
+  });
+
+  // Clear
+  document.getElementById('clearFilters').addEventListener('click', () => {
+    activeFilters = {};
+    document.querySelectorAll('.fp-chip.selected').forEach(c => c.classList.remove('selected'));
+    ageMin.value = 14; ageMax.value = 35;
+    updateAgeSlider(ageMin); updateAgeSlider(ageMax);
+    renderActiveFilters();
+  });
+
+  function renderActiveFilters() {
+    activeFiltersBar.innerHTML = '';
+    let count = 0;
+    Object.entries(activeFilters).forEach(([key, vals]) => {
+      vals.forEach(val => {
+        count++;
+        const chip = document.createElement('span');
+        chip.className = 'active-filter-chip';
+        chip.innerHTML = `${val} <span class="remove-icon">&#x2715;</span>`;
+        chip.addEventListener('click', () => {
+          activeFilters[key].delete(val);
+          document.querySelectorAll(`.fp-chip[data-val="${val}"]`).forEach(c => c.classList.remove('selected'));
+          renderActiveFilters();
+        });
+        activeFiltersBar.appendChild(chip);
+      });
+    });
+    filterActiveDot.classList.toggle('visible', count > 0);
+  }
+
+  // ─── MATCH MODAL ───
+  const matchOverlay = document.getElementById('matchOverlay');
+  let currentStep = 1;
+  const totalSteps = 3;
+  let matchData = {};
+  let searchInterval;
+
+  function openMatch(preGame) {
+    matchOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (preGame) {
+      const chip = document.querySelector(`.mm-chip[data-mm="game"][data-val="${preGame}"]`);
+      if (chip) { chip.classList.add('sel'); matchData.game = preGame; }
+    }
+  }
+  function closeMatch() {
+    matchOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+    clearInterval(searchInterval);
+    resetMatch();
+  }
+
+  function resetMatch() {
+    currentStep = 1;
+    matchData = {};
+    document.querySelectorAll('.mm-chip').forEach(c => c.classList.remove('sel','sel-purple','sel-green'));
+    document.getElementById('mmSearching').classList.remove('active');
+    document.getElementById('mmFound').classList.remove('active');
+    document.getElementById('mmFooter').style.display = 'flex';
+    document.getElementById('mmNext').textContent = 'Devam Et →';
+    document.getElementById('mmBack').style.display = 'none';
+    updateStep(1);
+  }
+
+  document.getElementById('openMatchModal').addEventListener('click', () => openMatch());
+  document.getElementById('openMatchModal2').addEventListener('click', () => openMatch());
+  document.getElementById('closeMatch').addEventListener('click', closeMatch);
+  matchOverlay.addEventListener('click', e => { if (e.target === matchOverlay) closeMatch(); });
+  document.getElementById('sideCTAMatch').addEventListener('click', () => openMatch());
+  document.getElementById('slide2MatchBtn').addEventListener('click', () => openMatch());
+
+  // Player card invite
+  function openMatchFromCard(name, game) {
+    openMatch(game);
+    setTimeout(() => {
+      const inp = document.getElementById('mmUsername');
+      if (inp) inp.placeholder = `${name} ile birlikte...`;
+    }, 300);
+  }
+
+  function updateStep(step) {
+    document.querySelectorAll('.mm-step-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.mm-step').forEach((s, i) => {
+      s.classList.toggle('active', i + 1 === step);
+      s.classList.toggle('done', i + 1 < step);
+    });
+    const content = document.getElementById(`mmStep${step}`);
+    if (content) content.classList.add('active');
+    document.getElementById('mmBack').style.display = step > 1 ? 'block' : 'none';
+    document.getElementById('mmNext').textContent = step < totalSteps ? 'Devam Et →' : '⚡ Esles!';
+  }
+
+  document.getElementById('mmNext').addEventListener('click', () => {
+    if (currentStep < totalSteps) {
+      currentStep++;
+      updateStep(currentStep);
+    } else {
+      startSearching();
+    }
+  });
+  document.getElementById('mmBack').addEventListener('click', () => {
+    if (currentStep > 1) { currentStep--; updateStep(currentStep); }
+  });
+
+  // Chip select in match modal
+  document.querySelectorAll('.mm-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      const group = this.dataset.mm;
+      document.querySelectorAll(`.mm-chip[data-mm="${group}"]`).forEach(c => c.classList.remove('sel','sel-purple','sel-green'));
+      this.classList.add('sel');
+      matchData[group] = this.dataset.val;
+    });
+  });
+
+  function startSearching() {
+    document.getElementById('mmSearching').classList.add('active');
+    document.getElementById('mmFound').classList.remove('active');
+    document.getElementById('mmFooter').style.display = 'none';
+    let t = 0;
+    const timerEl = document.getElementById('searchTimer');
+    searchInterval = setInterval(() => {
+      t++;
+      timerEl.textContent = t + 'sn';
+      if (t >= 4) {
+        clearInterval(searchInterval);
+        showMatchFound();
+      }
+    }, 1000);
+  }
+
+  function showMatchFound() {
+    document.getElementById('mmSearching').classList.remove('active');
+    document.getElementById('mmFound').classList.add('active');
+  }
+
+  // Keyboard ESC
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeFilter();
+      closeMatch();
+    }
+  });
+
+  const registerOverlay = document.getElementById('registerOverlay');
+  const loginOverlay    = document.getElementById('loginOverlay');
+
+  function openModal(overlay) {
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(overlay) {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('openRegister').addEventListener('click', () => openModal(registerOverlay));
+  document.getElementById('openLogin').addEventListener('click',    () => openModal(loginOverlay));
+  document.getElementById('closeRegister').addEventListener('click', () => closeModal(registerOverlay));
+  document.getElementById('closeLogin').addEventListener('click',    () => closeModal(loginOverlay));
+
+  // Switch links
+  document.getElementById('switchToLogin').addEventListener('click', () => {
+    closeModal(registerOverlay);
+    setTimeout(() => openModal(loginOverlay), 200);
+  });
+  document.getElementById('switchToRegister').addEventListener('click', () => {
+    closeModal(loginOverlay);
+    setTimeout(() => openModal(registerOverlay), 200);
+  });
+
+  // Click outside to close
+  [registerOverlay, loginOverlay].forEach(ov => {
+    ov.addEventListener('click', e => { if (e.target === ov) closeModal(ov); });
+  });
+
+  // ESC key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeModal(registerOverlay); closeModal(loginOverlay); }
+  });
+
+  // ─── PASSWORD STRENGTH ───
+  const regPassInput = document.getElementById('regPass');
+  if (regPassInput) {
+    regPassInput.addEventListener('input', function() {
+      const val = this.value;
+      const fill = document.getElementById('strengthFill');
+      const label = document.getElementById('strengthLabel');
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      const configs = [
+        { w: '0%',   color: 'transparent', text: '',        textColor: 'transparent' },
+        { w: '25%',  color: '#ff3b3b',     text: 'ZAYIF',   textColor: '#ff3b3b' },
+        { w: '50%',  color: '#ff8800',     text: 'ORTA',    textColor: '#ff8800' },
+        { w: '75%',  color: '#ffe000',     text: 'IYI',     textColor: '#ffe000' },
+        { w: '100%', color: '#00ff87',     text: 'GUCLU',   textColor: '#00ff87' },
+      ];
+      const c = configs[score];
+      fill.style.width = c.w;
+      fill.style.background = c.color;
+      label.textContent = c.text;
+      label.style.color = c.textColor;
+    });
+  }
+
+  // ─── TOGGLE PASSWORD ───
+  function togglePass(id, btn) {
+    const inp = document.getElementById(id);
+    if (!inp) return;
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.style.opacity = inp.type === 'text' ? '1' : '0.5';
+  }
+
+</script>
+</body>
+</html>

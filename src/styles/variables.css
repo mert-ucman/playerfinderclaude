@@ -1,0 +1,20 @@
+:root {
+  --bg-deep: #040610;
+  --bg-dark: #080d1a;
+  --bg-card: rgba(10, 15, 35, 0.85);
+  --cyan: #00f5ff;
+  --cyan-dim: rgba(0, 245, 255, 0.15);
+  --purple: #b400ff;
+  --purple-dim: rgba(180, 0, 255, 0.15);
+  --pink: #ff0090;
+  --yellow: #ffe000;
+  --green: #00ff87;
+  --red: #ff3b3b;
+  --text-bright: #ffffff;
+  --text-mid: rgba(255,255,255,0.7);
+  --text-dim: rgba(255,255,255,0.35);
+  --border: rgba(0, 245, 255, 0.12);
+  --glow-cyan: 0 0 30px rgba(0, 245, 255, 0.4);
+  --glow-purple: 0 0 30px rgba(180, 0, 255, 0.4);
+  --glow-pink: 0 0 30px rgba(255, 0, 144, 0.4);
+}

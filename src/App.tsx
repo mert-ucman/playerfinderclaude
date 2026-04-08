@@ -18,8 +18,9 @@ import CreateListingModal from './components/modals/CreateListingModal';
 import ProfilePage from './components/ProfilePage';
 import SearchPage from './components/SearchPage';
 import MessagesPanel from './components/MessagesPanel';
+import UserProfilePage from './components/UserProfilePage';
 
-type AppView = 'home' | 'profile' | 'search';
+type AppView = 'home' | 'profile' | 'search' | 'user-profile';
 
 export default function App() {
   const { user, login, logout, updateUser } = useAuth();
@@ -31,6 +32,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateListing, setShowCreateListing] = useState(false);
   const [msgTarget, setMsgTarget] = useState<{ id: string; username: string } | null>(null);
+  const [viewUser, setViewUser] = useState<{ id: string; username: string } | null>(null);
 
   const goHome = () => setView('home');
   const goProfile = () => setView('profile');
@@ -85,6 +87,19 @@ export default function App() {
         />
       )}
 
+      {view === 'user-profile' && viewUser && (
+        <UserProfilePage
+          userId={viewUser.id}
+          username={viewUser.username}
+          listings={listings}
+          onGoBack={() => setView('home')}
+          onMessage={(uid, uname) => {
+            setMsgTarget({ id: uid, username: uname });
+            setShowMessages(true);
+          }}
+        />
+      )}
+
       {view === 'search' && (
         <SearchPage
           query={searchQuery}
@@ -132,6 +147,7 @@ export default function App() {
           markRead={markRead}
           initialPartnerId={msgTarget?.id || null}
           initialPartnerUsername={msgTarget?.username || null}
+          onViewProfile={(uid, uname) => { setViewUser({ id: uid, username: uname }); setView('user-profile'); }}
         />
       )}
     </>

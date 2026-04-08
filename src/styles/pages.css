@@ -517,20 +517,22 @@
   letter-spacing: 1px;
 }
 .mp-close {
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--text-mid);
-  width: 32px;
-  height: 32px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-bright);
+  width: 34px;
+  height: 34px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
-.mp-close:hover { border-color: var(--red); color: var(--red); }
+.mp-close:hover { background: rgba(255,59,59,0.15); border-color: var(--red); color: var(--red); }
 
 .mp-body {
   display: grid;
@@ -633,6 +635,21 @@
   font-weight: 700;
   font-size: 15px;
   color: var(--text-bright);
+}
+.mp-profile-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+  font-family: 'Rajdhani', sans-serif;
+}
+.mp-profile-link:hover {
+  color: var(--cyan);
+  background: rgba(0,245,255,0.08);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .mp-messages {

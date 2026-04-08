@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 import { Listing, User } from '../../types';
+import CustomSelect from '../CustomSelect';
 
 interface CreateListingModalProps {
   user: User;
@@ -20,8 +22,7 @@ export default function CreateListingModal({ user, onClose, onSubmit }: CreateLi
     game: '', rank: '', style: '', size: '', lang: 'Turkce', mic: '', timeSlot: '', description: '',
   });
 
-  const set = (k: string) => (e: React.ChangeEvent<HTMLSelectElement | HTMLTextAreaElement>) =>
-    setForm(p => ({ ...p, [k]: e.target.value }));
+  const setField = (k: string) => (v: string) => setForm(p => ({ ...p, [k]: v }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,62 +49,49 @@ export default function CreateListingModal({ user, onClose, onSubmit }: CreateLi
             <h3 className="clm-title">⚡ İlan Oluştur</h3>
             <p className="clm-sub">Oyuncu arayan ilanın yayınlanacak</p>
           </div>
-          <button className="auth-close" style={{ position: 'static' }} onClick={onClose}>✕</button>
+          <button className="auth-close" style={{ position: 'static' }} onClick={onClose}><X size={16} strokeWidth={2.5} /></button>
         </div>
         <form className="clm-body" onSubmit={handleSubmit}>
           <div className="clm-grid">
             <div className="form-group">
               <label className="form-label">Oyun *</label>
-              <select className="form-input" value={form.game} onChange={set('game')} required>
-                <option value="">Oyun seç...</option>
-                {GAME_OPTIONS.map(g => <option key={g} value={g}>{g}</option>)}
-              </select>
+              <CustomSelect value={form.game} onChange={setField('game')} options={GAME_OPTIONS} placeholder="Oyun seç..." />
             </div>
             <div className="form-group">
               <label className="form-label">Rank</label>
-              <select className="form-input" value={form.rank} onChange={set('rank')}>
-                <option value="">Rank seç...</option>
-                {RANK_OPTIONS.map(r => <option key={r} value={r}>{r}</option>)}
-              </select>
+              <CustomSelect value={form.rank} onChange={setField('rank')} options={RANK_OPTIONS} placeholder="Rank seç..." />
             </div>
             <div className="form-group">
               <label className="form-label">Ekip Boyutu *</label>
-              <select className="form-input" value={form.size} onChange={set('size')} required>
-                <option value="">Boyut seç...</option>
-                {SIZE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
+              <CustomSelect value={form.size} onChange={setField('size')} options={SIZE_OPTIONS} placeholder="Boyut seç..." />
             </div>
             <div className="form-group">
               <label className="form-label">Oyun Stili</label>
-              <select className="form-input" value={form.style} onChange={set('style')}>
-                <option value="">Stil seç...</option>
-                {STYLE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
+              <CustomSelect value={form.style} onChange={setField('style')} options={STYLE_OPTIONS} placeholder="Stil seç..." />
             </div>
             <div className="form-group">
               <label className="form-label">Dil</label>
-              <select className="form-input" value={form.lang} onChange={set('lang')}>
-                {LANG_OPTIONS.map(l => <option key={l} value={l}>{l}</option>)}
-              </select>
+              <CustomSelect value={form.lang} onChange={setField('lang')} options={LANG_OPTIONS} />
             </div>
             <div className="form-group">
               <label className="form-label">Mikrofon</label>
-              <select className="form-input" value={form.mic} onChange={set('mic')}>
-                <option value="">Seç...</option>
-                {MIC_OPTIONS.map(m => <option key={m} value={m}>{m}</option>)}
-              </select>
+              <CustomSelect value={form.mic} onChange={setField('mic')} options={MIC_OPTIONS} placeholder="Seç..." />
             </div>
             <div className="form-group">
               <label className="form-label">Aktif Saat</label>
-              <select className="form-input" value={form.timeSlot} onChange={set('timeSlot')}>
-                <option value="">Seç...</option>
-                {TIME_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
+              <CustomSelect value={form.timeSlot} onChange={setField('timeSlot')} options={TIME_OPTIONS} placeholder="Seç..." />
             </div>
           </div>
           <div className="form-group">
             <label className="form-label">Açıklama</label>
-            <textarea className="form-input" rows={3} placeholder="Kendini ve aradığın oyuncuyu tanıt..." value={form.description} onChange={set('description')} style={{ resize: 'vertical', minHeight: '80px' }}></textarea>
+            <textarea
+              className="form-input"
+              rows={3}
+              placeholder="Kendini ve aradığın oyuncuyu tanıt..."
+              value={form.description}
+              onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
+              style={{ resize: 'vertical', minHeight: '80px' }}
+            ></textarea>
           </div>
           <div className="clm-footer">
             <button type="button" className="btn-ghost" onClick={onClose}>Vazgeç</button>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 import { User } from '../../types';
 
 interface RegisterModalProps {
@@ -58,9 +59,9 @@ export default function RegisterModal({ onClose, onSwitchToLogin, onLogin }: Reg
   return (
     <div className="auth-overlay open" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="auth-modal">
-        <button className="auth-close" onClick={onClose}>✕</button>
+        <button className="auth-close" onClick={onClose}><X size={16} strokeWidth={2.5} /></button>
         <div className="auth-left">
-          <div className="auth-brand"><div className="logo-icon">⬡</div>SQUAD<span>X</span></div>
+          <div className="auth-brand"><div className="logo-icon">⬡</div>SQUAD4<span>GAME</span></div>
           <div className="auth-left-content">
             <div className="auth-left-tag"><span className="dot"></span> 52.400+ Aktif Oyuncu</div>
             <h2 className="auth-left-title">EFSANELER<br /><span className="accent-cyan">BURADAN</span><br />BASLAR</h2>

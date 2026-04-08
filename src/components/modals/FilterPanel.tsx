@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 import { FilterState } from '../../types';
 
 interface FilterPanelProps {
@@ -41,7 +42,7 @@ export default function FilterPanel({ onClose }: FilterPanelProps) {
       <div className="filter-panel open">
         <div className="fp-header">
           <div className="fp-title">▼ FILTRELEME SECENEKLERI</div>
-          <button className="fp-close" onClick={onClose}>✕</button>
+          <button className="fp-close" onClick={onClose}><X size={15} strokeWidth={2.5} /></button>
         </div>
         <div className="fp-body">
           {filterGroups.map(g => (

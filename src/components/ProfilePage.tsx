@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { X } from 'lucide-react';
 import { Listing, User } from '../types';
+import CustomSelect from './CustomSelect';
 
 interface ProfilePageProps {
   user: User;
@@ -134,9 +136,11 @@ export default function ProfilePage({ user, listings, onUpdateUser, onDeleteList
                     </div>
                     <div className="form-group">
                       <label className="form-label">Bölge</label>
-                      <select className="form-input" value={accForm.region} onChange={setAcc('region')}>
-                        {REGION_OPTIONS.map(r => <option key={r} value={r}>{r}</option>)}
-                      </select>
+                      <CustomSelect
+                        value={accForm.region}
+                        onChange={v => setAccForm(p => ({ ...p, region: v }))}
+                        options={REGION_OPTIONS}
+                      />
                     </div>
                   </div>
                   <div className="form-group" style={{ marginTop: '16px' }}>
@@ -190,16 +194,20 @@ export default function ProfilePage({ user, listings, onUpdateUser, onDeleteList
                   <div className="profile-form-grid" style={{ marginTop: '20px' }}>
                     <div className="form-group">
                       <label className="form-label">Ana Oyun</label>
-                      <select className="form-input" value={primaryGame} onChange={e => setPrimaryGame(e.target.value)}>
-                        <option value="">Seç...</option>
-                        {selectedGames.map(g => <option key={g} value={g}>{g}</option>)}
-                      </select>
+                      <CustomSelect
+                        value={primaryGame}
+                        onChange={setPrimaryGame}
+                        options={selectedGames}
+                        placeholder="Seç..."
+                      />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Rank / Seviye</label>
-                      <select className="form-input" value={rank} onChange={e => setRank(e.target.value)}>
-                        {RANK_OPTIONS.map(r => <option key={r} value={r}>{r}</option>)}
-                      </select>
+                      <CustomSelect
+                        value={rank}
+                        onChange={setRank}
+                        options={RANK_OPTIONS}
+                      />
                     </div>
                   </div>
                   <div className="profile-save-row">
@@ -229,7 +237,7 @@ export default function ProfilePage({ user, listings, onUpdateUser, onDeleteList
                             {l.description && <p className="my-listing-desc">{l.description}</p>}
                             <span className="my-listing-time">{timeAgo(l.createdAt)}</span>
                           </div>
-                          <button className="my-listing-delete" onClick={() => onDeleteListing(l.id)}>✕ Kaldır</button>
+                          <button className="my-listing-delete" onClick={() => onDeleteListing(l.id)}><X size={13} /> Kaldır</button>
                         </div>
                       ))}
                     </div>

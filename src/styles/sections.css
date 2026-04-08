@@ -495,11 +495,12 @@
   gap: 24px;
   align-items: start;
 }
-.player-cards-col { overflow: hidden; }
+.player-cards-col { overflow: visible; }
 .player-card-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
+  padding: 6px 2px 2px;
 }
 .player-card {
   background: var(--bg-card);

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 import { MatchData } from '../../types';
 
 interface MatchModalProps {
@@ -59,7 +60,7 @@ export default function MatchModal({ onClose }: MatchModalProps) {
             <div className="mm-pretitle">Akilli Eslestirme Sistemi</div>
             <div className="mm-title">TAKIM ARA</div>
           </div>
-          <button className="mm-close" onClick={handleClose}>✕</button>
+          <button className="mm-close" onClick={handleClose}><X size={16} strokeWidth={2.5} /></button>
         </div>
 
         <div className="mm-steps">

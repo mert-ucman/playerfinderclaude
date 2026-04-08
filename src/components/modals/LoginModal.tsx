@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 import { User } from '../../types';
 
 interface LoginModalProps {
@@ -17,7 +18,7 @@ export default function LoginModal({ onClose, onSwitchToRegister, onLogin }: Log
     if (!identifier.trim() || !password.trim()) { setError('Tüm alanları doldurun.'); return; }
     // Try to find stored user or create demo
     try {
-      const stored = localStorage.getItem('squadx_user');
+      const stored = localStorage.getItem('squad4game_user');
       if (stored) {
         const u: User = JSON.parse(stored);
         if (u.email === identifier.trim() || u.username === identifier.trim()) {
@@ -43,9 +44,9 @@ export default function LoginModal({ onClose, onSwitchToRegister, onLogin }: Log
   return (
     <div className="auth-overlay open" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="auth-modal">
-        <button className="auth-close" onClick={onClose}>✕</button>
+        <button className="auth-close" onClick={onClose}><X size={16} strokeWidth={2.5} /></button>
         <div className="auth-left login-left">
-          <div className="auth-brand"><div className="logo-icon">⬡</div>SQUAD<span>X</span></div>
+          <div className="auth-brand"><div className="logo-icon">⬡</div>SQUAD4<span>GAME</span></div>
           <div className="auth-left-content">
             <div className="auth-left-tag" style={{ color: 'var(--purple)', background: 'var(--purple-dim)', borderColor: 'rgba(180,0,255,0.3)' }}>
               <span className="dot" style={{ background: 'var(--purple)', boxShadow: '0 0 6px var(--purple)' }}></span> Hosgeldin Geri

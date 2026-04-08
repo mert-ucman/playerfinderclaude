@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { X, LogOut } from 'lucide-react';
 import { User } from '../types';
 
 interface NavbarProps {
@@ -18,6 +19,7 @@ export default function Navbar({
   user, onGoProfile, onOpenMessages, onLogout, unreadCount, onGoSearch,
 }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
@@ -32,7 +34,7 @@ export default function Navbar({
       <nav className="navbar">
         <a href="#" className="nav-logo" onClick={e => { e.preventDefault(); }}>
           <div className="logo-icon">⬡</div>
-          SQUAD<span>X</span>
+          SQUAD4<span>GAME</span>
         </a>
 
         <ul className="nav-links nav-links-left nav-desktop-only">
@@ -63,7 +65,9 @@ export default function Navbar({
               <button className="nav-avatar-btn" onClick={onGoProfile} title={user.username}>
                 {initials}
               </button>
-              <button className="btn-ghost" onClick={onLogout}>Çıkış</button>
+              <button className="btn-ghost nav-logout-btn" onClick={() => setShowLogoutConfirm(true)}>
+                <LogOut size={14} /> Çıkış
+              </button>
             </>
           ) : (
             <>
@@ -93,8 +97,8 @@ export default function Navbar({
 
       <div className={`mobile-menu${menuOpen ? ' open' : ''}`}>
         <div className="mobile-menu-header">
-          <a href="#" className="nav-logo" onClick={close}><div className="logo-icon">⬡</div>SQUAD<span>X</span></a>
-          <button className="mobile-menu-close" onClick={close}>✕</button>
+          <a href="#" className="nav-logo" onClick={close}><div className="logo-icon">⬡</div>SQUAD4<span>GAME</span></a>
+          <button className="mobile-menu-close" onClick={close}><X size={18} strokeWidth={2.5} /></button>
         </div>
         <div className="mobile-menu-body">
           {user && (
@@ -116,7 +120,7 @@ export default function Navbar({
           </ul>
           <div className="mobile-auth-btns">
             {user ? (
-              <button className="btn-ghost" style={{ width: '100%' }} onClick={() => { onLogout(); close(); }}>Çıkış Yap</button>
+              <button className="btn-ghost" style={{ width: '100%' }} onClick={() => { setShowLogoutConfirm(true); close(); }}>Çıkış Yap</button>
             ) : (
               <>
                 <button className="btn-ghost" style={{ width: '100%' }} onClick={() => { onOpenLogin(); close(); }}>Giris Yap</button>
@@ -126,6 +130,22 @@ export default function Navbar({
           </div>
         </div>
       </div>
+
+      {showLogoutConfirm && (
+        <div className="logout-overlay" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="logout-confirm" onClick={e => e.stopPropagation()}>
+            <div className="lc-icon"><LogOut size={28} /></div>
+            <div className="lc-title">Çıkış Yap</div>
+            <p className="lc-text">Hesabından çıkılacaktır.<br />Onaylıyor musunuz?</p>
+            <div className="lc-btns">
+              <button className="lc-cancel" onClick={() => setShowLogoutConfirm(false)}>Vazgeç</button>
+              <button className="lc-confirm" onClick={() => { onLogout(); setShowLogoutConfirm(false); }}>
+                <LogOut size={14} /> Çıkış Yap
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

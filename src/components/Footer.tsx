@@ -3,12 +3,12 @@ import React from 'react';
 export default function Footer() {
   return (
     <footer className="footer">
-      <div className="footer-bg-text">SQUADX</div>
+      <div className="footer-bg-text">SQUAD4GAME</div>
       <div className="footer-top">
         <div className="footer-brand">
           <a href="#" className="nav-logo">
             <div className="logo-icon">⬡</div>
-            SQUAD<span>X</span>
+            SQUAD4<span>GAME</span>
           </a>
           <p className="footer-tagline">Türkiye'nin en büyük oyuncu topluluğunda takım arkadaşını bul, sıra dışı deneyimler yaşa, efsane ol.</p>
           <div className="social-links">
@@ -61,7 +61,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="footer-bottom">
-        <div className="footer-copy">© 2025 SQUADX. TÜM HAKLAR SAKLIDIR.</div>
+        <div className="footer-copy">© 2025 SQUAD4GAME. TÜM HAKLAR SAKLIDIR.</div>
         <div className="footer-legal">
           <a href="#">Gizlilik Politikası</a>
           <a href="#">Kullanım Koşulları</a>

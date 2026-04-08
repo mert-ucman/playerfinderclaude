@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { X } from 'lucide-react';
 import { Message, User } from '../types';
 
 interface Conversation {
@@ -18,6 +19,7 @@ interface MessagesPanelProps {
   markRead: (partnerId: string) => void;
   initialPartnerId?: string | null;
   initialPartnerUsername?: string | null;
+  onViewProfile?: (userId: string, username: string) => void;
 }
 
 function timeAgo(iso: string) {
@@ -30,7 +32,7 @@ function timeAgo(iso: string) {
 
 export default function MessagesPanel({
   user, onClose, getConversations, getThread, sendMessage, markRead,
-  initialPartnerId, initialPartnerUsername,
+  initialPartnerId, initialPartnerUsername, onViewProfile,
 }: MessagesPanelProps) {
   const [activeId, setActiveId] = useState<string | null>(initialPartnerId || null);
   const [activeUsername, setActiveUsername] = useState<string | null>(initialPartnerUsername || null);
@@ -44,6 +46,7 @@ export default function MessagesPanel({
 
   const send = () => {
     if (!input.trim() || !activeId || !activeUsername) return;
+    if (activeId === user.id) return;
     sendMessage({ fromUserId: user.id, fromUsername: user.username, toUserId: activeId, toUsername: activeUsername, content: input.trim() });
     setInput('');
   };
@@ -56,7 +59,7 @@ export default function MessagesPanel({
       <div className="messages-panel">
         <div className="mp-header">
           <div className="mp-title">💬 Mesajlar</div>
-          <button className="mp-close" onClick={onClose}>✕</button>
+          <button className="mp-close" onClick={onClose}><X size={16} strokeWidth={2.5} /></button>
         </div>
         <div className="mp-body">
           {/* Conversation list */}
@@ -102,7 +105,13 @@ export default function MessagesPanel({
               <div className="mp-chat-header">
                 <button className="mp-back" onClick={() => setActiveId(null)}>←</button>
                 <div className="mp-avatar sm">{(activeUsername || '?')[0].toUpperCase()}</div>
-                <span className="mp-chat-name">{activeUsername}</span>
+                <button
+                  className="mp-chat-name mp-profile-link"
+                  onClick={() => { if (activeId && activeUsername && onViewProfile) { onClose(); onViewProfile(activeId, activeUsername); } }}
+                  title="Profili görüntüle"
+                >
+                  {activeUsername}
+                </button>
               </div>
               <div className="mp-messages">
                 {thread.length === 0 && (

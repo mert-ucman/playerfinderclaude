@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Listing } from '../types';
 
-const KEY = 'squadx_listings';
+const KEY = 'squad4game_listings';
 
 const MOCK: Listing[] = [
   { id: 'l1', userId: 'u_neonx', username: 'NeonX_Pro', userRank: 'Diamond II', game: 'Valorant', rank: 'Diamond', style: 'Rekabetci', size: 'Duo (2)', lang: 'Turkce', mic: 'Zorunlu', timeSlot: 'Gece (22:00-02:00)', description: 'Diamond/Immortal arası ciddi bir duo arıyorum. Main Jett/Raze oynuyorum, iletişim şart.', createdAt: new Date(Date.now() - 3 * 60000).toISOString() },

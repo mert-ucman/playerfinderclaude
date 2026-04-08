@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Message } from '../types';
 
-const KEY = 'squadx_messages';
+const KEY = 'squad4game_messages';
 
 export function useMessages(userId: string | null) {
   const [messages, setMessages] = useState<Message[]>(() => {

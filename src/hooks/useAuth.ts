@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { User } from '../types';
 
-const KEY = 'squadx_user';
+const KEY = 'squad4game_user';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(() => {
